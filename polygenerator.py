@@ -46,8 +46,9 @@ class osmpoly_export:
     if (len(featids) == 0):
       infoString = QString("No features selected")
       QMessageBox.information(self.iface.mainWindow(),"Warning",infoString)
-    fileHandle = open ('c:\\Gis\\OSGeo4W\\apps\\qgis\\python\\plugins\\osmpoly_export\\test.txt', 'a')
+    fileHandle = open ('c:\\Gis\\OSGeo4W\\apps\\qgis\\python\\plugins\\osmpoly_export\\test.txt', 'w')
     for fid in featids: 
+       fileHandle.write(str(fid+1)+"\n")
        features={}
        result={}
        features[fid]=QgsFeature()
@@ -56,8 +57,10 @@ class osmpoly_export:
        i=0
        vertex=result[fid].vertexAt(i)
        while (vertex!=QgsPoint(0,0)):
-         fileHandle.write (str(vertex.x())+ " " + str(vertex.y()) +"\n")
+         fileHandle.write("    "+str(vertex.x())+ "     " + str(vertex.y()) +"\n")
          i+=1
          vertex=result[fid].vertexAt(i) 
+       fileHandle.write("END" +"\n")
+    fileHandle.write("END" +"\n")
     QMessageBox.information(self.iface.mainWindow(),"Warning",QString("done"))
     fileHandle.close()
