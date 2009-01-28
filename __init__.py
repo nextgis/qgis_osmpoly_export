@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
 def name():
-  return "osmpoly_export"
+  return "OSMPOLY_export"
 def description():
   return "Generate Poly files used by Osmosis from layers"
 def qgisMinimumVersion(): 
   return "1.0" 
 def version():
-  return "Version " + "0.0.2"
+  return "Version " + "0.0.3"
 def authorName():
   return "Maxim Dubinin, sim@gis-lab.info"
 def classFactory(iface):

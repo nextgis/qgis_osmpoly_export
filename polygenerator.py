@@ -3,29 +3,23 @@ from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 from qgis.core import *
 
-# инициализируем ресурсы Qt из файла resouces.py
 import resources
 
 class osmpoly_export:
 
   def __init__(self, iface):
     """Initialize the class"""
-    # сохраним ссылку на интерфейс QGIS
     self.iface = iface
   
   def initGui(self):
-    # создадим действие, которое будет запускать конфигурацию расширения
     self.action = QAction(QIcon(":/plugins/osmpoly_export/icon.png"), "Export to OSM Poly(s)", self.iface.mainWindow())
     self.action.setStatusTip("Generate Poly files from polygons")
     
-    # connect the action to the run method
     QObject.connect(self.action, SIGNAL("activated()"), self.run)
     
-    # добавим строку вызова в новое подменю
     self.iface.addPluginToMenu("&Export OSM Poly", self.action)
     
   def unload(self):
-    # удалить меню расширения и иконку
     self.iface.removePluginMenu("&Export OSM Poly",self.action)
     self.iface.removeToolBarIcon(self.action)
 
@@ -36,24 +30,32 @@ class osmpoly_export:
     if (curLayer == None):
       infoString = QString("No layers selected")
       QMessageBox.information(self.iface.mainWindow(),"Warning",infoString)
+      return
     if (curLayer.type() <> curLayer.VectorLayer):
       infoString = QString("Not a vector layer")
       QMessageBox.information(self.iface.mainWindow(),"Warning",infoString)
+      return
     if curLayer.geometryType() <> QGis.Polygon: 
       infoString = QString("Not a polygon layer")
       QMessageBox.information(self.iface.mainWindow(),"Warning",infoString)
+      return
     featids=curLayer.selectedFeaturesIds()
     if (len(featids) == 0):
-      infoString = QString("No features selected")
+      infoString = QString("No features selected, using all " + str(curLayer.featureCount()) + " features")
       QMessageBox.information(self.iface.mainWindow(),"Warning",infoString)
-    fileHandle = open ('c:\\Gis\\OSGeo4W\\apps\\qgis\\python\\plugins\\osmpoly_export\\test.txt', 'w')
+    fileHandle = open ('c:\\temp\\test.txt', 'w')
+    j=0
     for fid in featids: 
-       fileHandle.write(str(fid+1)+"\n")
+       j+=1
+       fileHandle.write(str(j)+"\n")
        features={}
        result={}
        features[fid]=QgsFeature()
        curLayer.featureAtId(fid,features[fid])
        result[fid]=features[fid].geometry()
+       attrs=features[fid].attributeMap()
+       for attr in attrs:
+          QMessageBox.information(self.iface.mainWindow(),"Warning",str(attr))
        i=0
        vertex=result[fid].vertexAt(i)
        while (vertex!=QgsPoint(0,0)):
