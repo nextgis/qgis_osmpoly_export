@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+mVersion = "0.0.4"
 def name():
   return "OSMPOLY_export"
 def description():
@@ -6,7 +7,7 @@ def description():
 def qgisMinimumVersion(): 
   return "1.0" 
 def version():
-  return "Version " + "0.0.4"
+  return mVersion
 def authorName():
   return "Maxim Dubinin, sim@gis-lab.info"
 def classFactory(iface):
