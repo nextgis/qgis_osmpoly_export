@@ -6,7 +6,7 @@ def description():
 def qgisMinimumVersion(): 
   return "1.0" 
 def version():
-  return "Version " + "0.0.3"
+  return "Version " + "0.0.4"
 def authorName():
   return "Maxim Dubinin, sim@gis-lab.info"
 def classFactory(iface):
