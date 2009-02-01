@@ -4,6 +4,7 @@ from PyQt4.QtGui import *
 from qgis.core import *
 
 import resources
+from polygenerator_dlgselfield import dlgSelField
 
 class osmpoly_export:
 
@@ -43,6 +44,7 @@ class osmpoly_export:
     if (len(featids) == 0):
       infoString = QString("No features selected, using all " + str(curLayer.featureCount()) + " features")
       QMessageBox.information(self.iface.mainWindow(),"Warning",infoString)
+      featids = range(curLayer.featureCount())
     fileHandle = open ('c:\\temp\\test.txt', 'w')
     j=0
     for fid in featids: 
@@ -53,9 +55,10 @@ class osmpoly_export:
        features[fid]=QgsFeature()
        curLayer.featureAtId(fid,features[fid])
        result[fid]=features[fid].geometry()
-       attrs=features[fid].attributeMap()
-       for attr in attrs:
-          QMessageBox.information(self.iface.mainWindow(),"Warning",str(attr))
+       attrmap=features[fid].attributeMap()
+       attrvals=attrmap.values()
+       for attr in attrvals:
+         QMessageBox.information(self.iface.mainWindow(),"Warning",attr.toString())
        i=0
        vertex=result[fid].vertexAt(i)
        while (vertex!=QgsPoint(0,0)):
@@ -64,5 +67,4 @@ class osmpoly_export:
          vertex=result[fid].vertexAt(i) 
        fileHandle.write("END" +"\n")
     fileHandle.write("END" +"\n")
-    QMessageBox.information(self.iface.mainWindow(),"Warning",QString("done"))
     fileHandle.close()
