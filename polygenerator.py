@@ -46,6 +46,8 @@ class osmpoly_export:
       QMessageBox.information(self.iface.mainWindow(),"Warning",infoString)
       featids = range(curLayer.featureCount())
     fileHandle = open ('c:\\temp\\test.txt', 'w')
+	res = dlgSelField()
+	QMessageBox.information(self.iface.mainWindow(),"Warning","res")
     j=0
     for fid in featids: 
        j+=1
