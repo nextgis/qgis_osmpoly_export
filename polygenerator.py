@@ -45,22 +45,37 @@ class osmpoly_export:
       infoString = QString("No features selected, using all " + str(curLayer.featureCount()) + " features")
       QMessageBox.information(self.iface.mainWindow(),"Warning",infoString)
       featids = range(curLayer.featureCount())
-    fileHandle = open ('c:\\temp\\test.txt', 'w')
-	res = dlgSelField()
-	QMessageBox.information(self.iface.mainWindow(),"Warning","res")
-    j=0
+    fProvider = curLayer.dataProvider()
+    myFields = fProvider.fields()
+    allFieldsNames= [f.name() for f in myFields.values()]
+    myFieldsNames=[]
+    for f in myFields.values():
+       if f.typeName() == "String":
+          myFieldsNames.append(f.name())
+    if len(myFieldsNames) == 0:
+       QMessageBox.information(self.iface.mainWindow(),"Warning","No string field names. Exiting")
+       return
+    elif len(myFieldsNames) == 1:
+       attrfield = myFieldsNames[0]
+    else:
+      res = dlgSelField(myFieldsNames)
+      if res.exec_():
+        attrfield=res.selectedAttr()
+      else:
+        return
+    attrindex = allFieldsNames.index(attrfield)
+    j=1
     for fid in featids: 
-       j+=1
-       fileHandle.write(str(j)+"\n")
        features={}
        result={}
        features[fid]=QgsFeature()
        curLayer.featureAtId(fid,features[fid])
        result[fid]=features[fid].geometry()
        attrmap=features[fid].attributeMap()
-       attrvals=attrmap.values()
-       for attr in attrvals:
-         QMessageBox.information(self.iface.mainWindow(),"Warning",attr.toString())
+       attr=attrmap.values()[attrindex]
+       fileHandle = open ('c:\\temp\\' + attr.toString() +'.txt', 'w')
+       fileHandle.write(attr.toString()+"\n")
+       fileHandle.write(str(j)+"\n")
        i=0
        vertex=result[fid].vertexAt(i)
        while (vertex!=QgsPoint(0,0)):
@@ -68,5 +83,5 @@ class osmpoly_export:
          i+=1
          vertex=result[fid].vertexAt(i) 
        fileHandle.write("END" +"\n")
-    fileHandle.write("END" +"\n")
-    fileHandle.close()
+       fileHandle.write("END" +"\n")
+       fileHandle.close()
