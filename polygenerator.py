@@ -66,7 +66,6 @@ class osmpoly_export:
     attrindex = allFieldsNames.index(attrfield)
     app = QApplication([])
     adir = QFileDialog.getExistingDirectory(None, "Open Directory", QDir.currentPath())
-    QMessageBox.information(self.iface.mainWindow(),"Warning",str(adir))
     j=1
     for fid in featids: 
        features={}
