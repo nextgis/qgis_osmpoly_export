@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-mVersion = "0.1.0"
+mVersion = "0.1.2"
 def name():
   return "OSMPOLY_export"
 def description():
