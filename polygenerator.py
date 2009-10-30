@@ -64,7 +64,7 @@ class osmpoly_export:
       else:
         return
     attrindex = allFieldsNames.index(attrfield)
-    app = QApplication([])
+    #app = QApplication([])
     adir = QFileDialog.getExistingDirectory(None, "Open Directory", QDir.currentPath())
     j=1
     for fid in featids: 
@@ -75,7 +75,7 @@ class osmpoly_export:
        result[fid]=features[fid].geometry()
        attrmap=features[fid].attributeMap()
        attr=attrmap.values()[attrindex]
-       fileHandle = open (str(adir) + "/" + attr.toString() +'.txt', 'w')
+       fileHandle = open (str(adir) + "/" + attr.toString() +'.poly', 'w')
        fileHandle.write(attr.toString()+"\n")
        fileHandle.write(str(j)+"\n")
        i=0
