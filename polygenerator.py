@@ -16,7 +16,7 @@ class osmpoly_export:
     self.action = QAction(QIcon(":/plugins/osmpoly_export/icon.png"), "Export to OSM Poly(s)", self.iface.mainWindow())
     self.action.setStatusTip("Generate Poly files from polygons")
     
-    QObject.connect(self.action, SIGNAL("activated()"), self.run)
+    QObject.connect(self.action, SIGNAL("triggered()"), self.run)
     
     self.iface.addPluginToMenu("&Export OSM Poly", self.action)
     
