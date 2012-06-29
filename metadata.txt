@@ -1,0 +1,19 @@
+[general]
+name = OSMPOLY_export
+description = Generate Poly files used by Osmosis from layers
+category = Vector
+version = 0.1.4
+qgisMinimumVersion = 1.0.0
+
+icon = icon.png
+
+authorName = Maxim Dubinin (NextGIS)
+
+tags = vector, osm, poly, osmosis
+
+homepage =
+tracker = http://hub.qgis.org/projects/osmpoly-export
+repository = http://svn.gis-lab.info/osmpoly_export
+
+experimental = False
+deprecated = False

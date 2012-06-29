@@ -3,7 +3,7 @@ from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 from qgis.core import *
 
-import resources
+import resources_rc
 from polygenerator_dlgselfield import dlgSelField
 
 class osmpoly_export:
@@ -11,18 +11,23 @@ class osmpoly_export:
   def __init__(self, iface):
     """Initialize the class"""
     self.iface = iface
-  
+
   def initGui(self):
     self.action = QAction(QIcon(":/plugins/osmpoly_export/icon.png"), "Export to OSM Poly(s)", self.iface.mainWindow())
     self.action.setStatusTip("Generate Poly files from polygons")
-    
+
     QObject.connect(self.action, SIGNAL("triggered()"), self.run)
-    
-    self.iface.addPluginToMenu("&Export OSM Poly", self.action)
-    
+
+    if hasattr( self.iface, "addPluginToVectorMenu" ):
+      self.iface.addPluginToVectorMenu("&Export OSM Poly", self.action)
+    else:
+      self.iface.addPluginToMenu("&Export OSM Poly", self.action)
+
   def unload(self):
-    self.iface.removePluginMenu("&Export OSM Poly",self.action)
-    self.iface.removeToolBarIcon(self.action)
+    if hasattr( self.iface, "addPluginToVectorMenu" ):
+      self.iface.removePluginVectorMenu("&Export OSM Poly",self.action)
+    else:
+      self.iface.removePluginMenu("&Export OSM Poly",self.action)
 
   def run(self):
     layersmap=QgsMapLayerRegistry.instance().mapLayers()
@@ -36,7 +41,7 @@ class osmpoly_export:
       infoString = QString("Not a vector layer")
       QMessageBox.information(self.iface.mainWindow(),"Warning",infoString)
       return
-    if curLayer.geometryType() <> QGis.Polygon: 
+    if curLayer.geometryType() <> QGis.Polygon:
       infoString = QString("Not a polygon layer")
       QMessageBox.information(self.iface.mainWindow(),"Warning",infoString)
       return
@@ -67,7 +72,7 @@ class osmpoly_export:
     #app = QApplication([])
     adir = QFileDialog.getExistingDirectory(None, "Open Directory", QDir.currentPath())
     j=1
-    for fid in featids: 
+    for fid in featids:
        features={}
        result={}
        features[fid]=QgsFeature()
@@ -83,7 +88,7 @@ class osmpoly_export:
        while (vertex!=QgsPoint(0,0)):
          fileHandle.write("    "+str(vertex.x())+ "     " + str(vertex.y()) +"\n")
          i+=1
-         vertex=result[fid].vertexAt(i) 
+         vertex=result[fid].vertexAt(i)
        fileHandle.write("END" +"\n")
        fileHandle.write("END" +"\n")
        fileHandle.close()
