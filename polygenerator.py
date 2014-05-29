@@ -1,4 +1,30 @@
 # -*- coding: utf-8 -*-
+
+#******************************************************************************
+#
+# osmpoly_export
+# ---------------------------------------------------------
+# Export vector polygons to poly-files used by Osmosis for cliping OpenStreetMap data
+#
+# Copyright (C) 2008-2014 NextGIS (info@nextgis.org)
+#
+# This source is free software; you can redistribute it and/or modify it under
+# the terms of the GNU General Public License as published by the Free
+# Software Foundation, either version 2 of the License, or (at your option)
+# any later version.
+#
+# This code is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+# details.
+#
+# A copy of the GNU General Public License is available on the World Wide Web
+# at <http://www.gnu.org/licenses/>. You can also obtain it by writing
+# to the Free Software Foundation, 51 Franklin Street, Suite 500 Boston,
+# MA 02110-1335 USA.
+#
+#******************************************************************************
+
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 from qgis.core import *
@@ -14,7 +40,7 @@ class osmpoly_export:
 
   def initGui(self):
     self.action = QAction(QIcon(":/plugins/osmpoly_export/icon.png"), "Export to OSM Poly(s)", self.iface.mainWindow())
-    self.action.setStatusTip("Generate Poly files from polygons")
+    self.action.setStatusTip("Export vector polygons to poly-files")
 
     QObject.connect(self.action, SIGNAL("triggered()"), self.run)
 
@@ -34,27 +60,29 @@ class osmpoly_export:
     layerslist=[]
     curLayer = self.iface.mapCanvas().currentLayer()
     if (curLayer == None):
-      infoString = QString("No layers selected")
+      infoString = "No layers selected"
       QMessageBox.information(self.iface.mainWindow(),"Warning",infoString)
       return
-    if (curLayer.type() <> curLayer.VectorLayer):
-      infoString = QString("Not a vector layer")
+    if (curLayer.type() != curLayer.VectorLayer):
+      infoString = "Not a vector layer"
       QMessageBox.information(self.iface.mainWindow(),"Warning",infoString)
       return
-    if curLayer.geometryType() <> QGis.Polygon:
-      infoString = QString("Not a polygon layer")
+    if curLayer.geometryType() != QGis.Polygon:
+      infoString = "Not a polygon layer"
       QMessageBox.information(self.iface.mainWindow(),"Warning",infoString)
       return
-    featids=curLayer.selectedFeaturesIds()
-    if (len(featids) == 0):
-      infoString = QString("No features selected, using all " + str(curLayer.featureCount()) + " features")
+    sel=curLayer.selectedFeatureCount()
+    if sel == 0:
+      infoString = "No features selected, using all " + str(curLayer.featureCount()) + " features"
       QMessageBox.information(self.iface.mainWindow(),"Warning",infoString)
-      featids = range(curLayer.featureCount())
+    else:
+      #TODO deal with selection if any
+      pass
+
     fProvider = curLayer.dataProvider()
     myFields = fProvider.fields()
-    allFieldsNames= [f.name() for f in myFields.values()]
     myFieldsNames=[]
-    for f in myFields.values():
+    for f in myFields:
        if f.typeName() == "String":
           myFieldsNames.append(f.name())
     if len(myFieldsNames) == 0:
@@ -68,27 +96,33 @@ class osmpoly_export:
         attrfield=res.selectedAttr()
       else:
         return
-    attrindex = allFieldsNames.index(attrfield)
-    #app = QApplication([])
-    adir = QFileDialog.getExistingDirectory(None, "Open Directory", QDir.currentPath())
-    j=1
-    for fid in featids:
-       features={}
-       result={}
-       features[fid]=QgsFeature()
-       curLayer.featureAtId(fid,features[fid])
-       result[fid]=features[fid].geometry()
-       attrmap=features[fid].attributeMap()
-       attr=attrmap.values()[attrindex]
-       fileHandle = open (str(adir) + "/" + attr.toString() +'.poly', 'w')
-       fileHandle.write(attr.toString()+"\n")
-       fileHandle.write(str(j)+"\n")
-       i=0
-       vertex=result[fid].vertexAt(i)
-       while (vertex!=QgsPoint(0,0)):
-         fileHandle.write("    "+str(vertex.x())+ "     " + str(vertex.y()) +"\n")
-         i+=1
-         vertex=result[fid].vertexAt(i)
-       fileHandle.write("END" +"\n")
+    
+    adir = QFileDialog.getExistingDirectory(None, "Choose a folder", QDir.currentPath())
+    
+    i = 0
+    
+    for f in curLayer.getFeatures():
+       geom=f.geometry()
+       if geom.isMultipart():
+         polygon = geom.asMultiPolygon()
+       else:
+         polygon = geom.asPolygon()
+
+       attr=f[attrfield]
+       fileHandle = open(str(adir) + "/" + attr +'.poly', 'w')
+       fileHandle.write(attr.encode('utf-8') + "\n")
+
+       for ring in polygon:
+         i = i + 1
+         if i>1:
+            fileHandle.write("!" + str(i) + "\n")
+         else:
+            fileHandle.write(str(i) + "\n")
+
+         #del ring[-1]
+         for vertex in ring:          
+           fileHandle.write("    " + str(vertex[0]) + "     " + str(vertex[1]) +"\n")
+         fileHandle.write("END" +"\n")
+
        fileHandle.write("END" +"\n")
        fileHandle.close()

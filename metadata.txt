@@ -1,19 +1,21 @@
 [general]
-name = OSMPOLY_export
-description = Generate Poly files used by Osmosis from layers
+name = osmpoly_export
+description = Export vector polygons to poly-files used by Osmosis for cliping OpenStreetMap data
 category = Vector
-version = 0.1.4
-qgisMinimumVersion = 1.0.0
+version = 0.2.0
+qgisMinimumVersion = 2.0.0
 
 icon = icon.png
 
-authorName = Maxim Dubinin (NextGIS)
+author = NextGIS
+authorName = Maxim Dubinin
+email = info@nextgis.org
 
 tags = vector, osm, poly, osmosis
 
-homepage =
-tracker = http://hub.qgis.org/projects/osmpoly-export
-repository = http://svn.gis-lab.info/osmpoly_export
+homepage = http://github.com/nextgis/osmpoly_export
+tracker = http://github.com/nextgis/osmpoly_export/issues
+repository = http://github.com/nextgis/osmpoly_export
 
 experimental = False
 deprecated = False

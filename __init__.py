@@ -1,19 +1,30 @@
 # -*- coding: utf-8 -*-
-mVersion = "0.1.4"
-def name():
-  return "OSMPOLY_export"
-def description():
-  return "Generate Poly files used by Osmosis from layers"
-def category():
-  return "Vector"
-def icon():
-  return "icon.png"
-def qgisMinimumVersion():
-  return "1.0.0"
-def version():
-  return "0.1.4"
-def authorName():
-  return "Maxim Dubinin (NextGIS)"
+
+#******************************************************************************
+#
+# osmpoly_export
+# ---------------------------------------------------------
+# Export vector polygons to poly-files used by Osmosis for cliping OpenStreetMap data
+#
+# Copyright (C) 2008-2014 NextGIS (info@nextgis.org)
+#
+# This source is free software; you can redistribute it and/or modify it under
+# the terms of the GNU General Public License as published by the Free
+# Software Foundation, either version 2 of the License, or (at your option)
+# any later version.
+#
+# This code is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+# details.
+#
+# A copy of the GNU General Public License is available on the World Wide Web
+# at <http://www.gnu.org/licenses/>. You can also obtain it by writing
+# to the Free Software Foundation, 51 Franklin Street, Suite 500 Boston,
+# MA 02110-1335 USA.
+#
+#******************************************************************************
+
 def classFactory(iface):
   from polygenerator import osmpoly_export
   return osmpoly_export(iface)

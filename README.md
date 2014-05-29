@@ -1,8 +1,8 @@
 osmpoly_export
 ==============
 
-This is QGIS 1.x plugin.
+This is QGIS 2.x plugin.
 
-Generate .poly files used by Osmosis from layers.
+Export polygons to poly-files used by Osmosis for cliping OpenStreetMap data.
 
-QGIS 2.0 and higher is not supported yet.
+Poly format: http://wiki.openstreetmap.org/wiki/Osmosis/Polygon_Filter_File_Format
