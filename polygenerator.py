@@ -6,7 +6,8 @@
 # ---------------------------------------------------------
 # Export vector polygons to poly-files used by Osmosis for cliping OpenStreetMap data
 #
-# Copyright (C) 2008-2014 NextGIS (info@nextgis.org)
+# Author: 2008-2016 Maxim Dubinin (maxim.dubinin@nextgis.com)
+# Copyright (C) NextGIS (info@nextgis.com)
 #
 # This source is free software; you can redistribute it and/or modify it under
 # the terms of the GNU General Public License as published by the Free
@@ -29,7 +30,8 @@ from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 from qgis.core import *
 
-import resources_rc
+import resources
+import sys
 from polygenerator_dlgselfield import dlgSelField
 
 class osmpoly_export:
@@ -39,7 +41,7 @@ class osmpoly_export:
     self.iface = iface
 
   def initGui(self):
-    self.action = QAction(QIcon(":/plugins/osmpoly_export/icon.png"), "Export to OSM Poly(s)", self.iface.mainWindow())
+    self.action = QAction(QIcon(":/plugins/osmpoly_export/icon.png"), "Export OSM Poly", self.iface.mainWindow())
     self.action.setStatusTip("Export vector polygons to poly-files")
 
     QObject.connect(self.action, SIGNAL("triggered()"), self.run)
@@ -59,25 +61,27 @@ class osmpoly_export:
     layersmap=QgsMapLayerRegistry.instance().mapLayers()
     layerslist=[]
     curLayer = self.iface.mapCanvas().currentLayer()
+
     if (curLayer == None):
-      infoString = "No layers selected"
-      QMessageBox.information(self.iface.mainWindow(),"Warning",infoString)
-      return
+        infoString = "No layers selected"
+        QMessageBox.information(self.iface.mainWindow(),"Warning",infoString)
+        return
     if (curLayer.type() != curLayer.VectorLayer):
-      infoString = "Not a vector layer"
-      QMessageBox.information(self.iface.mainWindow(),"Warning",infoString)
-      return
+        infoString = "Not a vector layer"
+        QMessageBox.information(self.iface.mainWindow(),"Warning",infoString)
+        return
     if curLayer.geometryType() != QGis.Polygon:
-      infoString = "Not a polygon layer"
-      QMessageBox.information(self.iface.mainWindow(),"Warning",infoString)
-      return
-    sel=curLayer.selectedFeatureCount()
-    if sel == 0:
-      infoString = "No features selected, using all " + str(curLayer.featureCount()) + " features"
-      QMessageBox.information(self.iface.mainWindow(),"Warning",infoString)
+        infoString = "Not a polygon layer"
+        QMessageBox.information(self.iface.mainWindow(),"Warning",infoString)
+        return
+    if curLayer.selectedFeatureCount():
+        infoString = 'Using ' + str(curLayer.selectedFeatureCount()) + ' selected features'
+        QMessageBox.information(self.iface.mainWindow(),"Information",infoString)
+        features = curLayer.selectedFeatures()
     else:
-      #TODO deal with selection if any
-      pass
+        infoString = "No features selected, using all " + str(curLayer.featureCount()) + " features"
+        QMessageBox.information(self.iface.mainWindow(),"Information",infoString)
+        features = curLayer.getFeatures()
 
     fProvider = curLayer.dataProvider()
     myFields = fProvider.fields()
@@ -99,30 +103,29 @@ class osmpoly_export:
     
     adir = QFileDialog.getExistingDirectory(None, "Choose a folder", QDir.currentPath())
     
-    i = 0
-    
-    for f in curLayer.getFeatures():
-       geom=f.geometry()
-       if geom.isMultipart():
-         polygon = geom.asMultiPolygon()
-       else:
-         polygon = geom.asPolygon()
+    for f in features: 
+        i = 0
+        geom=f.geometry()
+        if geom.isMultipart():
+            polygon = geom.asMultiPolygon()
+        else:
+            polygon = geom.asPolygon()
 
-       attr=f[attrfield]
-       fileHandle = open(str(adir) + "/" + attr +'.poly', 'w')
-       fileHandle.write(attr.encode('utf-8') + "\n")
+        attr=f[attrfield]
+        f = open(adir + "/" + attr +'.poly', 'w')
+        f.write(attr.encode('utf-8') + "\n")
 
-       for ring in polygon:
-         i = i + 1
-         if i>1:
-            fileHandle.write("!" + str(i) + "\n")
-         else:
-            fileHandle.write(str(i) + "\n")
+        for ring in polygon:
+             i = i + 1
+             if i>1:
+                f.write("!" + str(i) + "\n")
+             else:
+                f.write(str(i) + "\n")
 
-         #del ring[-1]
-         for vertex in ring:          
-           fileHandle.write("    " + str(vertex[0]) + "     " + str(vertex[1]) +"\n")
-         fileHandle.write("END" +"\n")
+             #del ring[-1]
+             for vertex in ring:          
+               f.write("    " + str(vertex[0]) + "     " + str(vertex[1]) +"\n")
+             f.write("END" +"\n")
 
-       fileHandle.write("END" +"\n")
-       fileHandle.close()
+        f.write("END" +"\n")
+        f.close()
