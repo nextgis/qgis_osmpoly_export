@@ -40,7 +40,7 @@ from polygenerator_dlgselfield import dlgSelField
 
 class osmpoly_export:
     def tr(self, message):
-        return QCoreApplication.translate('OsmInfo', message)
+        return QCoreApplication.translate('OSMPoly_export', message)
 
     def __init__(self, iface):
         """Initialize the class"""
@@ -55,7 +55,7 @@ class osmpoly_export:
         else:
             locale_full_name = QSettings().value('locale/userLocale', '', type=unicode)
 
-        self.locale_path = '%s/i18n/osminfo_%s.qm' % (_current_path, locale_full_name[0:2])
+        self.locale_path = '%s/i18n/osmpoly_export_%s.qm' % (_current_path, locale_full_name[0:2])
         if QFileInfo(self.locale_path).exists():
             self.translator = QTranslator()
             self.translator.load(self.locale_path)
