@@ -15,7 +15,7 @@
     <message>
         <location filename="aboutdialog.py" line="81"/>
         <source>&lt;p&gt;This plugin exports vector polygons in OSM Poly format.&lt;/p&gt;&lt;p&gt;Its export all or selected set of polygons and names output files according to table of attributes.&lt;p&gt;&lt;strong&gt;Developer&lt;/strong&gt;: Maxim Dubinin (&lt;a href=&quot;http://nextgis.com&quot;&gt;NextGIS&lt;/a&gt;).&lt;/p&gt;&lt;p&gt;&lt;strong&gt;Homepage&lt;/strong&gt;: &lt;a href=&quot;https://github.com/nextgis/osmpoly_export&quot;&gt;https://github.com/nextgis/osmpoly_export&lt;/a&gt;&lt;/p&gt;&lt;p&gt;Please report bugs at &lt;a href=&quot;https://github.com/nextgis/osmpoly_export/issues&quot;&gt;bugtracker&lt;/a&gt;&lt;/p&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;p&gt;Это расширение экспортирует полигоны в формате OSM Poly.&lt;/p&gt;&lt;p&gt;Оно может экспортировать все полигоны или выделенные. Названия для выходных файлов задаются по таблице атрибутов.&lt;p&gt;&lt;strong&gt;Разработчик&lt;/strong&gt;: Maxim Dubinin (&lt;a href=&quot;http://nextgis.com&quot;&gt;NextGIS&lt;/a&gt;).&lt;/p&gt;&lt;p&gt;&lt;strong&gt;Домашняя страница&lt;/strong&gt;: &lt;a href=&quot;https://github.com/nextgis/osmpoly_export&quot;&gt;https://github.com/nextgis/osmpoly_export&lt;/a&gt;&lt;/p&gt;&lt;p&gt;Сообщения об ошибках: &lt;a href=&quot;https://github.com/nextgis/osmpoly_export/issues&quot;&gt;bugtracker&lt;/a&gt;&lt;/p&gt;</translation>
     </message>
 </context>
 <context>
@@ -67,13 +67,6 @@ p, li { white-space: pre-wrap; }
 </source>
         <translation>Обнаружен QGIS %s
 </translation>
-    </message>
-    <message>
-        <location filename="polygenerator.py" line="69"/>
-        <source>This version of OSMInfo requires at least QGIS version 2.0.
-Plugin will not be enabled.</source>
-        <translation>Эта версия OSMInfo требует QGIS минимум версии 2.0.
-Плагин работать не будет.</translation>
     </message>
     <message>
         <location filename="polygenerator.py" line="99"/>
@@ -144,6 +137,13 @@ Plugin will not be enabled.</source>
         <location filename="polygenerator.py" line="151"/>
         <source>Choose a folder</source>
         <translation>Выберите папку</translation>
+    </message>
+    <message>
+        <location filename="polygenerator.py" line="69"/>
+        <source>This version of OSMPoly_export requires at least QGIS version 2.0.
+Plugin will not be enabled.</source>
+        <translation>Эта версия OSMPoly_export требует QGIS минимум версии 2.0.
+Плагин работать не будет.</translation>
     </message>
 </context>
 </TS>

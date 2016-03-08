@@ -40,7 +40,7 @@ from polygenerator_dlgselfield import dlgSelField
 
 class osmpoly_export:
     def tr(self, message):
-        return QCoreApplication.translate('OSMPoly_export', message)
+        return QCoreApplication.translate('osmpoly_export', message)
 
     def __init__(self, iface):
         """Initialize the class"""
@@ -67,9 +67,9 @@ class osmpoly_export:
         if int(self.qgsVersion) < 20000:
             qgisVersion = self.qgsVersion[0] + "." + self.qgsVersion[2] + "." + self.qgsVersion[3]
             QMessageBox.warning(self.iface.mainWindow(),
-                                'OSMInfo', self.tr('Error'),
-                                'OSMInfo', self.tr('QGIS %s detected.\n') % (qgisVersion) +
-                                'OSMInfo', self.tr('This version of OSMInfo requires at least QGIS version 2.0.\nPlugin will not be enabled.'))
+                                'osmpoly_export', self.tr('Error'),
+                                'osmpoly_export', self.tr('QGIS %s detected.\n') % (qgisVersion) +
+                                'osmpoly_export', self.tr('This version of OSMPoly_export requires at least QGIS version 2.0.\nPlugin will not be enabled.'))
             return None
         
         self.actionRun = QAction(self.tr('Export OSM Poly'), self.iface.mainWindow())
