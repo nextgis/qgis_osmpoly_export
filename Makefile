@@ -1,4 +1,4 @@
-UI_PATH=.
+UI_PATH=ui
 UI_SOURCES=$(wildcard $(UI_PATH)/*.ui)
 UI_FILES=$(patsubst $(UI_PATH)/%.ui, $(UI_PATH)/ui_%.py, $(UI_SOURCES))
 
@@ -32,17 +32,24 @@ $(UI_FILES): $(UI_PATH)/ui_%.py: $(UI_PATH)/%.ui
 $(LANG_FILES): $(LANG_PATH)/%.qm: $(LANG_PATH)/%.ts
 	lrelease $<
 
-$(RES_FILES): $(RES_PATH)/%_rc.py: $(RES_PATH)/%.qrc
+$(RES_FILES): $(RES_PATH)/%.py: $(RES_PATH)/%.qrc
 	pyrcc4 -o $@ $<
+
+pep8:
+	@echo
+	@echo "-----------"
+	@echo "PEP8 issues"
+	@echo "-----------"
+	@pep8 --repeat --ignore=E203,E121,E122,E123,E124,E125,E126,E127,E128 --exclude resources.py . || true
 
 clean:
 	rm -f $(ALL_FILES)
-	rm -f *.pyc
+	find -name "*.pyc" -exec rm -f {} \;
 	rm -f *.zip
 
 package:
-	cd .. && rm -f *.zip && zip -r osmpoly_export.zip osmpoly_export -x \*.pyc \*.ts \*.ui \*.qrc \*.pro \*~ \*.git\* \*.svn\* \*Makefile*
+	cd .. && rm -f *.zip && zip -r osmpoly_export.zip osmpoly_export -x \*.pyc \*.svg \*.ts \*.ui \*.qrc \*.pro \*ui\* \*art\* \*~ \*.git\* \resources\* \*Makefile*
 	mv ../osmpoly_export.zip .
 
 upload:
-	plugin_uploader_NG.py osmpoly_export.zip
+	plugin_uploaderNG.py osmpoly_export.zip
