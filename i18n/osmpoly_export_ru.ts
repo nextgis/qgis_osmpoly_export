@@ -71,7 +71,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="polygenerator.py" line="99"/>
         <source>Export OSM Poly</source>
-        <translation type="unfinished">Экспорт в OSM Poly</translation>
+        <translation>Экспорт в OSM Poly</translation>
     </message>
     <message>
         <location filename="polygenerator.py" line="77"/>
@@ -124,17 +124,17 @@ p, li { white-space: pre-wrap; }
         <translation>Будет сконвертировано %s объект(ов)</translation>
     </message>
     <message>
-        <location filename="polygenerator.py" line="129"/>
+        <location filename="polygenerator.py" line="134"/>
         <source>No features selected, using all %s features</source>
-        <translation>Объекты не выбраны, будут сконвертированы все имеющиеся</translation>
+        <translation>Объекты не выбраны, будут сконвертированы все имеющиеся %s</translation>
     </message>
     <message>
-        <location filename="polygenerator.py" line="140"/>
+        <location filename="polygenerator.py" line="145"/>
         <source>No string field names. Exiting</source>
         <translation>Нет строковых полей в таблице.</translation>
     </message>
     <message>
-        <location filename="polygenerator.py" line="151"/>
+        <location filename="polygenerator.py" line="156"/>
         <source>Choose a folder</source>
         <translation>Выберите папку</translation>
     </message>
@@ -144,6 +144,11 @@ p, li { white-space: pre-wrap; }
 Plugin will not be enabled.</source>
         <translation>Эта версия OSMPoly_export требует QGIS минимум версии 2.0.
 Плагин работать не будет.</translation>
+    </message>
+    <message>
+        <location filename="polygenerator.py" line="130"/>
+        <source>Layer is empty</source>
+        <translation>В слое нет объектов</translation>
     </message>
 </context>
 </TS>
