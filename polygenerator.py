@@ -126,9 +126,14 @@ class osmpoly_export:
             QMessageBox.information(self.iface.mainWindow(),strInfo,infoString)
             features = curLayer.selectedFeatures()
         else:
-            infoString = self.tr('No features selected, using all %s features')% str(curLayer.featureCount())
-            QMessageBox.information(self.iface.mainWindow(),strInfo,infoString)
-            features = curLayer.getFeatures()
+            if curLayer.featureCount() == 0:
+                infoString = self.tr('Layer is empty')
+                QMessageBox.information(self.iface.mainWindow(),strWarning,infoString)
+                return
+            else:
+                infoString = self.tr('No features selected, using all %s features')% str(curLayer.featureCount())
+                QMessageBox.information(self.iface.mainWindow(),strInfo,infoString)
+                features = curLayer.getFeatures()
 
         fProvider = curLayer.dataProvider()
         myFields = fProvider.fields()
@@ -150,35 +155,36 @@ class osmpoly_export:
 
         adir = QFileDialog.getExistingDirectory(None, self.tr('Choose a folder'), QDir.currentPath())
 
-        num = 0
-        for f in features: 
-            num = num + 1
-            geom=f.geometry()
-            
-            polygons = geom.asMultiPolygon()
-            if len(polygons) == 0: polygons = [geom.asPolygon()]
+        if adir != '':
+            num = 0
+            for f in features: 
+                num = num + 1
+                geom=f.geometry()
+                
+                polygons = geom.asMultiPolygon()
+                if len(polygons) == 0: polygons = [geom.asPolygon()]
 
-            attr=f[attrfield]
-            if isinstance(attr, QPyNullVariant): attr = 'feature' + str(num)
-            
-            f = open(adir + "/" + attr +'.poly', 'w')
-            f.write(attr.encode('utf-8') + "\n")
+                attr=f[attrfield]
+                if isinstance(attr, QPyNullVariant): attr = 'feature' + str(num)
+                
+                f = open(adir + "/" + attr +'.poly', 'w')
+                f.write(attr.encode('utf-8') + "\n")
 
-            i = 0
-            for polygon in polygons:
-                j = 0
-                for ring in polygon:
-                     j = j + 1
-                     i = i + 1
-                     if j>1:
-                        f.write("!" + str(i) + "\n")
-                     else:
-                        f.write(str(i) + "\n")
+                i = 0
+                for polygon in polygons:
+                    j = 0
+                    for ring in polygon:
+                         j = j + 1
+                         i = i + 1
+                         if j>1:
+                            f.write("!" + str(i) + "\n")
+                         else:
+                            f.write(str(i) + "\n")
 
-                     #del ring[-1]
-                     for vertex in ring:          
-                       f.write("    " + str(vertex[0]) + "     " + str(vertex[1]) +"\n")
-                     f.write("END" +"\n")
+                         #del ring[-1]
+                         for vertex in ring:          
+                           f.write("    " + str(vertex[0]) + "     " + str(vertex[1]) +"\n")
+                         f.write("END" +"\n")
 
-            f.write("END" +"\n")
-            f.close()
+                f.write("END" +"\n")
+                f.close()
