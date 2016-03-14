@@ -48,7 +48,7 @@ clean:
 	rm -f *.zip
 
 package:
-	cd .. && rm -f *.zip && zip -r osmpoly_export.zip osmpoly_export -x \*.pyc \*.svg \*.ts \*.ui \*.qrc \*.pro \*ui\* \*art\* \*~ \*.git\* \resources\* \*Makefile*
+	cd .. && rm -f *.zip && zip -r osmpoly_export.zip osmpoly_export -x \*.pyc \*.svg \*.ts \*.qrc \*.pro \*art\* \*~ \*.git\* \resources\* \*Makefile*
 	mv ../osmpoly_export.zip .
 
 upload:
