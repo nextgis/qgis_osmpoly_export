@@ -9,3 +9,9 @@ About Poly format: http://wiki.openstreetmap.org/wiki/Osmosis/Polygon_Filter_Fil
 
 
 ![Example](/art/osmpoly_export.png)
+
+Commercial support
+----------
+Need to fix a bug or add a feature to OSMPoly_export? We provide custom development and support for this software. [Contact us](http://nextgis.ru/en/contact/) to discuss options!
+
+[![http://nextgis.com](http://nextgis.ru/img/nextgis.png)](http://nextgis.com)
