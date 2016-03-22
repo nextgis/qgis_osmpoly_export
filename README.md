@@ -10,6 +10,10 @@ About Poly format: http://wiki.openstreetmap.org/wiki/Osmosis/Polygon_Filter_Fil
 
 ![Example](/art/osmpoly_export.png)
 
+License
+-------------
+This program is licensed under GNU GPL v2 or any later version
+
 Commercial support
 ----------
 Need to fix a bug or add a feature to OSMPoly_export? We provide custom development and support for this software. [Contact us](http://nextgis.ru/en/contact/) to discuss options!
