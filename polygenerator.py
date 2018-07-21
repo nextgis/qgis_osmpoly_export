@@ -154,7 +154,14 @@ class osmpoly_export:
             return
 
         adir = QFileDialog.getExistingDirectory(None, self.tr('Choose a folder'), QDir.currentPath())
-
+        
+        
+        crsSrc = curLayer.crs();
+        transform = None;
+        if(crsSrc.authid()!="EPSG:4326"):
+            crsDest = QgsCoordinateReferenceSystem(4326);    # WGS 84
+            transform = QgsCoordinateTransform(crsSrc, crsDest);
+        
         if adir != '':
             num = 0
             for f in features: 
@@ -174,17 +181,20 @@ class osmpoly_export:
                 for polygon in polygons:
                     j = 0
                     for ring in polygon:
-                         j = j + 1
-                         i = i + 1
-                         if j>1:
+                        j = j + 1
+                        i = i + 1
+                        if j>1:
                             f.write("!" + str(i) + "\n")
-                         else:
+                        else:
                             f.write(str(i) + "\n")
 
-                         #del ring[-1]
-                         for vertex in ring:          
-                           f.write("    " + str(vertex[0]) + "     " + str(vertex[1]) +"\n")
-                         f.write("END" +"\n")
+                        #del ring[-1]
+                        for vertex in ring:
+                            v2 = vertex;
+                            if(transform!=None):
+                                v2 = transform.transform(vertex);
+                            f.write("    " + str(v2[0]) + "     " + str(v2[1]) +"\n")
+                        f.write("END" +"\n")
 
                 f.write("END" +"\n")
                 f.close()
