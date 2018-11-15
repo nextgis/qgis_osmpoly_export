@@ -34,7 +34,7 @@ import os
 
 from qgis.PyQt import uic
 from qgis.PyQt.QtWidgets import QDialogButtonBox, QDialog
-from qgis.PyQt.QtGui import QPixmap, QDesktopServices
+from qgis.PyQt.QtGui import QPixmap, QDesktopServices, QTextDocument
 from qgis.PyQt.QtCore import QSettings, QUrl, QLocale
 
 from . import resources

@@ -34,8 +34,6 @@ from PyQt5.QtWidgets import (QGroupBox, QVBoxLayout, QHBoxLayout, QPushButton,
 class dlgSelField(QDialog):
     def __init__(self, myFieldsNames, parent=None):
         QDialog.__init__(self)
-        # fix_print_with_import
-        print("init")
         gr = QGroupBox(self)
         vbox = QVBoxLayout(gr)
         names = myFieldsNames
