@@ -26,14 +26,18 @@
 #
 #******************************************************************************
 
-import ConfigParser
+from __future__ import absolute_import
+from future import standard_library
+standard_library.install_aliases()
+import configparser
 import os
 
-from PyQt4 import uic
-from PyQt4.QtGui import QDialogButtonBox, QPixmap, QTextDocument, QDialog, QDesktopServices
-from PyQt4.QtCore import QSettings, QUrl, QLocale
+from qgis.PyQt import uic
+from qgis.PyQt.QtWidgets import QDialogButtonBox, QDialog
+from qgis.PyQt.QtGui import QPixmap, QDesktopServices
+from qgis.PyQt.QtCore import QSettings, QUrl, QLocale
 
-import resources
+from . import resources
 
 FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), 'ui/aboutdialogbase.ui'))
 
@@ -47,7 +51,7 @@ class AboutDialog(QDialog, FORM_CLASS):
 
         self.lblLogo.setPixmap(QPixmap(':/plugins/osmpoly_export/icons/osmpoly_export.png'))
 
-        cfg = ConfigParser.SafeConfigParser()
+        cfg = configparser.SafeConfigParser()
         cfg.read(os.path.join(os.path.dirname(__file__), 'metadata.txt'))
         version = cfg.get('general', 'version')
 
