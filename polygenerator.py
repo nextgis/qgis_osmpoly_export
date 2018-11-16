@@ -29,7 +29,8 @@
 from builtins import str
 from builtins import object
 
-from qgis.core import Qgis, QgsProject, QgsWkbTypes, QgsVectorLayer
+from qgis.core import (Qgis, QgsProject, QgsWkbTypes, QgsVectorLayer,
+                       QgsCoordinateReferenceSystem, QgsCoordinateTransform)
 from PyQt5.QtCore import QSettings, QLocale, QFileInfo, QCoreApplication, QDir
 from PyQt5.QtWidgets import QAction, QMessageBox, QFileDialog
 from PyQt5.QtGui import QIcon
@@ -121,7 +122,8 @@ class osmpoly_export(object):
             infoString = self.tr('Not a vector layer')
             QMessageBox.information(self.iface.mainWindow(),strWarning,infoString)
             return
-        if curLayer.wkbType() != QgsWkbTypes.Polygon:
+        if curLayer.wkbType() not in [QgsWkbTypes.Polygon,
+                                      QgsWkbTypes.MultiPolygon]:
             infoString = self.tr('Not a polygon layer')
             QMessageBox.information(self.iface.mainWindow(),strWarning,infoString)
             return
@@ -143,7 +145,7 @@ class osmpoly_export(object):
         myFields = fProvider.fields()
         myFieldsNames=[]
         for f in myFields:
-            if f.typeName() in ["String", "string"]:
+            if f.typeName() in ["String", "string", "text"]:
                 myFieldsNames.append(f.name())
         if len(myFieldsNames) == 0:
             QMessageBox.information(self.iface.mainWindow(),strWarning,self.tr('No string field names. Exiting'))
@@ -164,7 +166,8 @@ class osmpoly_export(object):
         transform = None;
         if(crsSrc.authid()!="EPSG:4326"):
             crsDest = QgsCoordinateReferenceSystem(4326);    # WGS 84
-            transform = QgsCoordinateTransform(crsSrc, crsDest);
+            transform = QgsCoordinateTransform(crsSrc, crsDest,
+                                               QgsProject.instance());
 
         if adir != '':
             num = 0
