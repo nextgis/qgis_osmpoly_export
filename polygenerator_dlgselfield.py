@@ -26,20 +26,24 @@
 #
 #******************************************************************************
 
-from PyQt4.QtCore import *
-from PyQt4.QtGui import *
+from qgis.PyQt.QtCore import pyqtSignal, pyqtSlot
+from qgis.PyQt.QtWidgets import QDialog, QRadioButton, QVBoxLayout, QHBoxLayout, QScrollArea, QWidget, QPushButton
 
 class dlgSelField(QDialog):
   def __init__(self, myFieldsNames, parent=None):
     QDialog.__init__(self)
-    print "init"
-    gr = QGroupBox(self)
-    vbox = QVBoxLayout(gr)
+    print("init")
     names = myFieldsNames
-    self.rbl = [QRadioButton(name, gr) for name in names]
+    self.rbl = [QRadioButton(name) for name in names]
     self.rbl[0].setChecked(True)
-    for rb in self.rbl: vbox.addWidget(rb)
-    gr.adjustSize()
+
+    vbox = QVBoxLayout()
+    for rb in self.rbl:
+        vbox.addWidget(rb)
+    scrollArea = QScrollArea()
+    areaWidget = QWidget()
+    areaWidget.setLayout(vbox)
+    scrollArea.setWidget(areaWidget)
 
     hbox = QHBoxLayout()
     pbnYes = QPushButton('Yes', self)
@@ -48,11 +52,11 @@ class dlgSelField(QDialog):
     hbox.addWidget(pbnCancel)
 
     layout = QVBoxLayout(self)
-    layout.addWidget(gr)
+    layout.addWidget(scrollArea)
     layout.addLayout(hbox)
 
-    self.connect(pbnYes, SIGNAL("clicked()"), SLOT("accept()"))
-    self.connect(pbnCancel, SIGNAL("clicked()"), SLOT("reject()"))
+    pbnYes.clicked.connect(self.accept)
+    pbnCancel.clicked.connect(self.reject)
   def selectedAttr(self):
     for rb in self.rbl: 
       if rb.isChecked(): 

@@ -27,5 +27,5 @@
 #******************************************************************************
 
 def classFactory(iface):
-  from polygenerator import osmpoly_export
+  from .polygenerator import osmpoly_export
   return osmpoly_export(iface)

@@ -26,17 +26,21 @@
 #
 #******************************************************************************
 
-from PyQt4.QtCore import *
-from PyQt4.QtGui import *
-from qgis.core import *
+from qgis.PyQt.QtCore import QSettings, QCoreApplication, QFileInfo, QTranslator, QDir
+from qgis.PyQt.QtGui import QIcon
+from qgis.PyQt.QtWidgets import QMessageBox, QAction, QFileDialog
+#from qgis.core import *
+import qgis
 
-import aboutdialog
-import resources
+from .compat import get_file_path, QGis, map_layers, PolygonGeometry
+from . import aboutdialog
+from . import resources
 from os import path
 import sys
-_fs_encoding = sys.getfilesystemencoding()
-_current_path = unicode(path.abspath(path.dirname(__file__)), _fs_encoding)
-from polygenerator_dlgselfield import dlgSelField
+
+_current_path = get_file_path(__file__)
+
+from .polygenerator_dlgselfield import dlgSelField
 
 class osmpoly_export:
     def tr(self, message):
@@ -46,14 +50,14 @@ class osmpoly_export:
         """Initialize the class"""
         # save reference to QGIS interface
         self.iface = iface
-        self.qgsVersion = unicode(QGis.QGIS_VERSION_INT)
+        self.qgsVersion = str(QGis.QGIS_VERSION_INT)
         
         # i18n support
         override_locale = QSettings().value('locale/overrideFlag', False, type=bool)
         if not override_locale:
             locale_full_name = QLocale.system().name()
         else:
-            locale_full_name = QSettings().value('locale/userLocale', '', type=unicode)
+            locale_full_name = QSettings().value('locale/userLocale', '', type=str)
 
         self.locale_path = '%s/i18n/osmpoly_export_%s.qm' % (_current_path, locale_full_name[0:2])
         if QFileInfo(self.locale_path).exists():
@@ -103,7 +107,7 @@ class osmpoly_export:
         d.exec_()
     
     def run(self):
-        layersmap=QgsMapLayerRegistry.instance().mapLayers()
+        layersmap = map_layers()
         layerslist=[]
         curLayer = self.iface.mapCanvas().currentLayer()
         
@@ -117,7 +121,7 @@ class osmpoly_export:
             infoString = self.tr('Not a vector layer')
             QMessageBox.information(self.iface.mainWindow(),strWarning,infoString)
             return
-        if curLayer.geometryType() != QGis.Polygon:
+        if curLayer.geometryType() != PolygonGeometry:
             infoString = self.tr('Not a polygon layer')
             QMessageBox.information(self.iface.mainWindow(),strWarning,infoString)
             return
@@ -172,10 +176,10 @@ class osmpoly_export:
                 if len(polygons) == 0: polygons = [geom.asPolygon()]
 
                 attr=f[attrfield]
-                if isinstance(attr, QPyNullVariant): attr = 'feature' + str(num)
+                if attr == qgis.core.NULL: attr = 'feature' + str(num)
                 
-                f = open(adir + "/" + attr +'.poly', 'w')
-                f.write(attr.encode('utf-8') + "\n")
+                f = open(adir + "/" + attr +'.poly', 'wb')
+                f.write((attr + "\n").encode('utf-8'))
 
                 i = 0
                 for polygon in polygons:
@@ -184,17 +188,17 @@ class osmpoly_export:
                         j = j + 1
                         i = i + 1
                         if j>1:
-                            f.write("!" + str(i) + "\n")
+                            f.write(("!" + str(i) + "\n").encode())
                         else:
-                            f.write(str(i) + "\n")
+                            f.write((str(i) + "\n").encode())
 
                         #del ring[-1]
                         for vertex in ring:
                             v2 = vertex;
                             if(transform!=None):
                                 v2 = transform.transform(vertex);
-                            f.write("    " + str(v2[0]) + "     " + str(v2[1]) +"\n")
-                        f.write("END" +"\n")
+                            f.write(("    " + str(v2[0]) + "     " + str(v2[1]) +"\n").encode())
+                        f.write("END\n".encode())
 
-                f.write("END" +"\n")
+                f.write("END\n".encode())
                 f.close()
