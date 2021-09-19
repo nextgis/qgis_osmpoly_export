@@ -77,12 +77,6 @@ class QgsCoordinateReferenceSystem(core.QgsCoordinateReferenceSystem):
         else:
             return core.QgsCoordinateReferenceSystem(id)
 
-def map_layers():
-    if QGis.QGIS_VERSION_INT >= 30000:
-        return core.QgsProject.instance().mapLayers
-    else:
-        return core.QgsMapLayerRegistry.instance().mapLayers
-
 if QGis.QGIS_VERSION_INT >= 30000:
     PolygonGeometry = core.QgsWkbTypes.PolygonGeometry
 else:

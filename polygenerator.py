@@ -32,7 +32,7 @@ from qgis.PyQt.QtWidgets import QMessageBox, QAction, QFileDialog
 #from qgis.core import *
 import qgis
 
-from .compat import get_file_path, QGis, map_layers, PolygonGeometry
+from .compat import get_file_path, QGis, PolygonGeometry
 from . import aboutdialog
 from . import resources
 from os import path
@@ -107,7 +107,6 @@ class osmpoly_export:
         d.exec_()
     
     def run(self):
-        layersmap = map_layers()
         layerslist=[]
         curLayer = self.iface.mapCanvas().currentLayer()
         
