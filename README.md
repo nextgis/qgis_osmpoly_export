@@ -1,7 +1,7 @@
 osmpoly_export
 ==============
 
-This is QGIS 2.x plugin.
+This is a QGIS 2.x plugin.
 
 It exports all or selected vector polygons to poly-files used by Osmosis, Osmconvert (and probably other OSM-related tools) for cliping OpenStreetMap data.
 
@@ -16,6 +16,8 @@ This program is licensed under GNU GPL v2 or any later version
 
 Commercial support
 ----------
-Need to fix a bug or add a feature to OSMPoly_export? We provide custom development and support for this software. [Contact us](http://nextgis.ru/en/contact/) to discuss options!
+Need to fix a bug or add a feature to OSMPoly_export? 
 
-[![http://nextgis.com](http://nextgis.ru/img/nextgis.png)](http://nextgis.com)
+We provide custom development and support for this software. [Contact us](https://nextgis.com/contact/) to discuss options!
+
+[![https://nextgis.com](https://nextgis.com/img/nextgis.png)](https://nextgis.com)
