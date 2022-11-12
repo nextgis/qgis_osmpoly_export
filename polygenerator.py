@@ -26,7 +26,7 @@
 #
 #******************************************************************************
 
-from qgis.PyQt.QtCore import QSettings, QCoreApplication, QFileInfo, QTranslator, QDir
+from qgis.PyQt.QtCore import QSettings, QCoreApplication, QFileInfo, QTranslator, QDir , QLocale
 from qgis.PyQt.QtGui import QIcon
 from qgis.PyQt.QtWidgets import QMessageBox, QAction, QFileDialog
 #from qgis.core import *
