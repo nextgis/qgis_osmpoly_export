@@ -12,7 +12,8 @@ icon = icons/osmpoly_export.png
 author=NextGIS
 email=info@nextgis.com
 changelog=
-        0.6: Fixes, updates, cleanup
+        0.6: 
+            * Fixes, updates, cleanup
         0.5:
             * QGIS 3 support added
         0.4:
