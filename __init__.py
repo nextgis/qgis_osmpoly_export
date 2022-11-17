@@ -6,7 +6,7 @@
 # ---------------------------------------------------------
 # Export vector polygons to poly-files used by Osmosis for cliping OpenStreetMap data
 #
-# Author: 2008-2016 Maxim Dubinin (maxim.dubinin@nextgis.com)
+# Author: 2008-2022 Maxim Dubinin (maxim.dubinin@nextgis.com)
 # Copyright (C) NextGIS (info@nextgis.com)
 #
 # This source is free software; you can redistribute it and/or modify it under
