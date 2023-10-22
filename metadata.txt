@@ -1,7 +1,9 @@
 [general]
 name=osmpoly_export
 description=Export vector polygons to poly-files
+description[ru]=Экспорт векторных полигонов в полифайлы
 about=Select a feature or export the whole layer as poly-files used by Osmosis for cliping OpenStreetMap data. Developed by NextGIS. Any feedback is welcome at https://nextgis.com/contact
+about[ru]=Выберите объект или экспортируйте весь слой в виде полифайлов, используемых Osmosis для вырезания данных OpenStreetMap. Разработан компанией NextGIS. Любые отзывы приветствуются на https://nextgis.com/contact.
 category = Vector
 version = 0.6
 qgisMinimumVersion=2.0
@@ -12,7 +14,7 @@ icon = icons/osmpoly_export.png
 author=NextGIS
 email=info@nextgis.com
 changelog=
-        0.6: 
+        0.6:
             * Fixes, updates, cleanup
         0.5:
             * QGIS 3 support added
@@ -28,12 +30,14 @@ changelog=
             * export now works for selected features
             * fixed bug with wrong ! assignment
             * fixed bug with export to unicode folders (with umlauts etc)
-            
+
 tags=vector,osm,poly,osmosis,openstreetmap,export
 
 homepage = http://nextgis.com
 tracker = http://github.com/nextgis/qgis_osmpoly_export/issues
 repository = http://github.com/nextgis/qgis_osmpoly_export
+video=https://youtu.be/gGE7o2_P8gA
+video[ru]=https://youtu.be/q_5I5RZsOi4
 
 experimental = False
 deprecated = False

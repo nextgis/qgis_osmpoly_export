@@ -33,8 +33,9 @@ from qgis.core import *
 import qgis
 
 from .compat import get_file_path, QGis, PolygonGeometry
-from . import aboutdialog
+from . import about_dialog
 from . import resources
+import os
 from os import path
 import sys
 
@@ -51,6 +52,7 @@ class osmpoly_export:
         """Initialize the class"""
         # save reference to QGIS interface
         self.iface = iface
+        self.plugin_dir = path.dirname(__file__)
 
         # i18n support
         override_locale = QSettings().value('locale/overrideFlag', False, type=bool)
@@ -94,8 +96,8 @@ class osmpoly_export:
         self.iface.removePluginVectorMenu(self.tr('Export OSM Poly'), self.actionRun)
 
     def about(self):
-        d = aboutdialog.AboutDialog()
-        d.exec_()
+        dialog = about_dialog.AboutDialog(os.path.basename(self.plugin_dir))
+        dialog.exec_()
 
     def run(self):
         layerslist = []
