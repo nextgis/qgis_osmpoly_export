@@ -1,23 +1,29 @@
-osmpoly_export
-==============
+# OSMPoly Export
 
-This is a QGIS 3.x plugin.
+A QGIS plugin. Export all or selected vector polygons to *.poly files used by Osmosis, Osmconvert (and similar). 
 
-It exports all or selected vector polygons to poly-files used by Osmosis, Osmconvert (and probably other OSM-related tools) for cliping OpenStreetMap data.
+About Poly format: https://wiki.openstreetmap.org/wiki/Osmosis/Polygon_Filter_File_Format 
 
-About Poly format: http://wiki.openstreetmap.org/wiki/Osmosis/Polygon_Filter_File_Format
+QGIS plugins page: https://plugins.qgis.org/plugins/osmpoly_export/ 
 
 
-![Example](art/osmpoly_export.png)
+## Export vector polygons to *.poly files
+
+![osmpolyexport](https://github.com/nextgis/qgis_osmpoly_export/assets/101568545/7b6d3586-b975-49b3-8647-6ef40cb4d51b)
+
+## YouTube
+-------------
+[![gGE7o2_P8gA](https://github.com/nextgis/qgis_osmpoly_export/assets/101568545/1a9b3f21-63af-471b-b951-6f97a96ebdd5)](https://youtu.be/gGE7o2_P8gA)
 
 License
 -------------
-This program is licensed under GNU GPL v2 or any later version
+This program is licensed under GNU GPL v.2 or any later version.
 
 Commercial support
-----------
-Need to fix a bug or add a feature to OSMPoly_export? 
+------------------
+Need to fix a bug or add a feature to OSMPoly Export?
 
-We provide custom development and support for this software. [Contact us](https://nextgis.com/contact/) to discuss options!
+We provide custom development and support for this software. [Contact us](https://nextgis.com/contact/?utm_source=nextgis-github&utm_medium=plugins&utm_campaign=osmpolyexport) to discuss options!
 
-[![https://nextgis.com](https://nextgis.com/img/nextgis.png)](https://nextgis.com)
+
+[![https://nextgis.com](https://nextgis.com/img/nextgis_x-logo.png)](https://nextgis.com?utm_source=nextgis-github&utm_medium=plugins&utm_campaign=osmpolyexport)
