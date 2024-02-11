@@ -26,10 +26,16 @@
 #
 # ******************************************************************************
 
-from qgis.PyQt.QtCore import QSettings, QCoreApplication, QFileInfo, QTranslator, QDir, QLocale
+from qgis.PyQt.QtCore import (
+        QSettings, QCoreApplication, QFileInfo,
+        QTranslator, QDir, QLocale, QVariant
+    )
 from qgis.PyQt.QtGui import QIcon
 from qgis.PyQt.QtWidgets import QMessageBox, QAction, QFileDialog
-from qgis.core import *
+from qgis.core import (
+        QgsVectorLayer, QgsCoordinateTransform, QgsCoordinateReferenceSystem,
+        QgsProject, QgsWkbTypes, QgsMapLayer
+    )
 import qgis
 
 from .compat import get_file_path, QGis, PolygonGeometry
@@ -90,7 +96,11 @@ class osmpoly_export:
         self.actionRun.triggered.connect(self.run)
         self.actionAbout.triggered.connect(self.about)
 
+        self.__check_enable_run(self.iface.activeLayer())
+        self.iface.currentLayerChanged.connect(self.__check_enable_run)
+
     def unload(self):
+        self.iface.currentLayerChanged.disconnect(self.__check_enable_run)
         self.iface.removeVectorToolBarIcon(self.actionRun)
         self.iface.removePluginVectorMenu(self.tr('Export OSM Poly'), self.actionAbout)
         self.iface.removePluginVectorMenu(self.tr('Export OSM Poly'), self.actionRun)
@@ -135,7 +145,7 @@ class osmpoly_export:
         myFields = fProvider.fields()
         myFieldsNames = []
         for f in myFields:
-            if f.typeName() == "String":
+            if f.type() == QVariant.String:
                 myFieldsNames.append(f.name())
         if len(myFieldsNames) == 0:
             QMessageBox.information(self.iface.mainWindow(), strWarning, self.tr('No string field names. Exiting'))
@@ -193,3 +203,19 @@ class osmpoly_export:
 
                 f.write("END\n".encode())
                 f.close()
+
+    def __check_enable_run(self, layer: QgsMapLayer):
+        is_enabled = self.__check_type_active_layer(layer)
+        self.actionRun.setEnabled(is_enabled)
+
+    def __check_type_active_layer(self, new_layer: QgsMapLayer):
+        if new_layer is None:
+            return False
+
+        if not isinstance(new_layer, QgsVectorLayer):
+            return False
+
+        if new_layer.wkbType() != QgsWkbTypes.MultiPolygon:
+            return False
+
+        return True
