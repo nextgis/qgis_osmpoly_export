@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-#******************************************************************************
+# ******************************************************************************
 #
 # osmpoly_export
 # ---------------------------------------------------------
@@ -24,8 +24,10 @@
 # to the Free Software Foundation, 51 Franklin Street, Suite 500 Boston,
 # MA 02110-1335 USA.
 #
-#******************************************************************************
+# ******************************************************************************
+
 
 def classFactory(iface):
-  from .polygenerator import osmpoly_export
-  return osmpoly_export(iface)
+    from .polygenerator import osmpoly_export
+
+    return osmpoly_export(iface)

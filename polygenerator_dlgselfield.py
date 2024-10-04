@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-#******************************************************************************
+# ******************************************************************************
 #
 # osmpoly_export
 # ---------------------------------------------------------
@@ -24,40 +24,50 @@
 # to the Free Software Foundation, 51 Franklin Street, Suite 500 Boston,
 # MA 02110-1335 USA.
 #
-#******************************************************************************
+# ******************************************************************************
 
 from qgis.PyQt.QtCore import pyqtSignal, pyqtSlot
-from qgis.PyQt.QtWidgets import QDialog, QRadioButton, QVBoxLayout, QHBoxLayout, QScrollArea, QWidget, QPushButton
+from qgis.PyQt.QtWidgets import (
+    QDialog,
+    QRadioButton,
+    QVBoxLayout,
+    QHBoxLayout,
+    QScrollArea,
+    QWidget,
+    QPushButton,
+)
+
 
 class dlgSelField(QDialog):
-  def __init__(self, myFieldsNames, parent=None):
-    QDialog.__init__(self)
-    print("init")
-    names = myFieldsNames
-    self.rbl = [QRadioButton(name) for name in names]
-    self.rbl[0].setChecked(True)
+    def __init__(self, myFieldsNames, parent=None):
+        QDialog.__init__(self)
+        print("init")
+        names = myFieldsNames
+        self.rbl = [QRadioButton(name) for name in names]
+        self.rbl[0].setChecked(True)
 
-    vbox = QVBoxLayout()
-    for rb in self.rbl:
-        vbox.addWidget(rb)
-    scrollArea = QScrollArea()
-    areaWidget = QWidget()
-    areaWidget.setLayout(vbox)
-    scrollArea.setWidget(areaWidget)
+        vbox = QVBoxLayout()
+        for rb in self.rbl:
+            vbox.addWidget(rb)
+        scrollArea = QScrollArea()
+        areaWidget = QWidget()
+        areaWidget.setLayout(vbox)
+        scrollArea.setWidget(areaWidget)
 
-    hbox = QHBoxLayout()
-    pbnYes = QPushButton('Yes', self)
-    pbnCancel = QPushButton('Cancel', self)
-    hbox.addWidget(pbnYes)
-    hbox.addWidget(pbnCancel)
+        hbox = QHBoxLayout()
+        pbnYes = QPushButton("Yes", self)
+        pbnCancel = QPushButton("Cancel", self)
+        hbox.addWidget(pbnYes)
+        hbox.addWidget(pbnCancel)
 
-    layout = QVBoxLayout(self)
-    layout.addWidget(scrollArea)
-    layout.addLayout(hbox)
+        layout = QVBoxLayout(self)
+        layout.addWidget(scrollArea)
+        layout.addLayout(hbox)
 
-    pbnYes.clicked.connect(self.accept)
-    pbnCancel.clicked.connect(self.reject)
-  def selectedAttr(self):
-    for rb in self.rbl: 
-      if rb.isChecked(): 
-         return rb.text()
+        pbnYes.clicked.connect(self.accept)
+        pbnCancel.clicked.connect(self.reject)
+
+    def selectedAttr(self):
+        for rb in self.rbl:
+            if rb.isChecked():
+                return rb.text()

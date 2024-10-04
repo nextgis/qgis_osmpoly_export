@@ -26,7 +26,14 @@
 #
 # ******************************************************************************
 
-from qgis.PyQt.QtCore import QSettings, QCoreApplication, QFileInfo, QTranslator, QDir, QLocale
+from qgis.PyQt.QtCore import (
+    QSettings,
+    QCoreApplication,
+    QFileInfo,
+    QTranslator,
+    QDir,
+    QLocale,
+)
 from qgis.PyQt.QtGui import QIcon
 from qgis.PyQt.QtWidgets import QMessageBox, QAction, QFileDialog
 from qgis.core import *
@@ -46,7 +53,7 @@ from .polygenerator_dlgselfield import dlgSelField
 
 class osmpoly_export:
     def tr(self, message):
-        return QCoreApplication.translate('osmpoly_export', message)
+        return QCoreApplication.translate("osmpoly_export", message)
 
     def __init__(self, iface):
         """Initialize the class"""
@@ -55,13 +62,20 @@ class osmpoly_export:
         self.plugin_dir = path.dirname(__file__)
 
         # i18n support
-        override_locale = QSettings().value('locale/overrideFlag', False, type=bool)
+        override_locale = QSettings().value(
+            "locale/overrideFlag", False, type=bool
+        )
         if not override_locale:
             locale_full_name = QLocale.system().name()
         else:
-            locale_full_name = QSettings().value('locale/userLocale', '', type=str)
+            locale_full_name = QSettings().value(
+                "locale/userLocale", "", type=str
+            )
 
-        self.locale_path = '%s/i18n/osmpoly_export_%s.qm' % (_current_path, locale_full_name[0:2])
+        self.locale_path = "%s/i18n/osmpoly_export_%s.qm" % (
+            _current_path,
+            locale_full_name[0:2],
+        )
         if QFileInfo(self.locale_path).exists():
             self.translator = QTranslator()
             self.translator.load(self.locale_path)
@@ -69,19 +83,31 @@ class osmpoly_export:
 
     def initGui(self):
         """Initialize graphic user interface"""
-        self.actionRun = QAction(self.tr('Export OSM Poly'), self.iface.mainWindow())
-        self.actionRun.setIcon(QIcon(':/plugins/osmpoly_export/icons/osmpoly_export.png'))
-        self.actionRun.setWhatsThis(self.tr('Start conversion to Poly'))
-        self.actionRun.setStatusTip(self.tr('Export vector polygons to poly-files'))
+        self.actionRun = QAction(
+            self.tr("Export OSM Poly"), self.iface.mainWindow()
+        )
+        self.actionRun.setIcon(
+            QIcon(":/plugins/osmpoly_export/icons/osmpoly_export.png")
+        )
+        self.actionRun.setWhatsThis(self.tr("Start conversion to Poly"))
+        self.actionRun.setStatusTip(
+            self.tr("Export vector polygons to poly-files")
+        )
 
-        self.actionAbout = QAction(self.tr('About'), self.iface.mainWindow())
-        self.actionAbout.setIcon(QIcon(':/plugins/osmpoly_export/icons/about.png'))
-        self.actionAbout.setWhatsThis(self.tr('About OSMPoly_export'))
+        self.actionAbout = QAction(self.tr("About"), self.iface.mainWindow())
+        self.actionAbout.setIcon(
+            QIcon(":/plugins/osmpoly_export/icons/about.png")
+        )
+        self.actionAbout.setWhatsThis(self.tr("About OSMPoly_export"))
 
         # add plugin menu to Vector
-        self.osmpoly_export_menu = self.tr(u'Export OSM Poly')
-        self.iface.addPluginToVectorMenu(self.osmpoly_export_menu, self.actionRun)
-        self.iface.addPluginToVectorMenu(self.osmpoly_export_menu, self.actionAbout)
+        self.osmpoly_export_menu = self.tr("Export OSM Poly")
+        self.iface.addPluginToVectorMenu(
+            self.osmpoly_export_menu, self.actionRun
+        )
+        self.iface.addPluginToVectorMenu(
+            self.osmpoly_export_menu, self.actionAbout
+        )
 
         # add icon to new menu item in Vector toolbar
         self.iface.addVectorToolBarIcon(self.actionRun)
@@ -92,8 +118,12 @@ class osmpoly_export:
 
     def unload(self):
         self.iface.removeVectorToolBarIcon(self.actionRun)
-        self.iface.removePluginVectorMenu(self.tr('Export OSM Poly'), self.actionAbout)
-        self.iface.removePluginVectorMenu(self.tr('Export OSM Poly'), self.actionRun)
+        self.iface.removePluginVectorMenu(
+            self.tr("Export OSM Poly"), self.actionAbout
+        )
+        self.iface.removePluginVectorMenu(
+            self.tr("Export OSM Poly"), self.actionRun
+        )
 
     def about(self):
         dialog = about_dialog.AboutDialog(os.path.basename(self.plugin_dir))
@@ -103,32 +133,48 @@ class osmpoly_export:
         layerslist = []
         curLayer = self.iface.mapCanvas().currentLayer()
 
-        strWarning = self.tr('Warning')
-        strInfo = self.tr('Information')
-        if (curLayer == None):
-            infoString = self.tr('No layers selected')
-            QMessageBox.information(self.iface.mainWindow(), strWarning, infoString)
+        strWarning = self.tr("Warning")
+        strInfo = self.tr("Information")
+        if curLayer == None:
+            infoString = self.tr("No layers selected")
+            QMessageBox.information(
+                self.iface.mainWindow(), strWarning, infoString
+            )
             return
-        if (curLayer.type() != curLayer.VectorLayer):
-            infoString = self.tr('Not a vector layer')
-            QMessageBox.information(self.iface.mainWindow(), strWarning, infoString)
+        if curLayer.type() != curLayer.VectorLayer:
+            infoString = self.tr("Not a vector layer")
+            QMessageBox.information(
+                self.iface.mainWindow(), strWarning, infoString
+            )
             return
         if curLayer.geometryType() != PolygonGeometry:
-            infoString = self.tr('Not a polygon layer')
-            QMessageBox.information(self.iface.mainWindow(), strWarning, infoString)
+            infoString = self.tr("Not a polygon layer")
+            QMessageBox.information(
+                self.iface.mainWindow(), strWarning, infoString
+            )
             return
         if curLayer.selectedFeatureCount():
-            infoString = self.tr('Using %s selected features') % str(curLayer.selectedFeatureCount())
-            QMessageBox.information(self.iface.mainWindow(), strInfo, infoString)
+            infoString = self.tr("Using %s selected features") % str(
+                curLayer.selectedFeatureCount()
+            )
+            QMessageBox.information(
+                self.iface.mainWindow(), strInfo, infoString
+            )
             features = curLayer.selectedFeatures()
         else:
             if curLayer.featureCount() == 0:
-                infoString = self.tr('Layer is empty')
-                QMessageBox.information(self.iface.mainWindow(), strWarning, infoString)
+                infoString = self.tr("Layer is empty")
+                QMessageBox.information(
+                    self.iface.mainWindow(), strWarning, infoString
+                )
                 return
             else:
-                infoString = self.tr('No features selected, using all %s features') % str(curLayer.featureCount())
-                QMessageBox.information(self.iface.mainWindow(), strInfo, infoString)
+                infoString = self.tr(
+                    "No features selected, using all %s features"
+                ) % str(curLayer.featureCount())
+                QMessageBox.information(
+                    self.iface.mainWindow(), strInfo, infoString
+                )
                 features = curLayer.getFeatures()
 
         fProvider = curLayer.dataProvider()
@@ -138,7 +184,11 @@ class osmpoly_export:
             if f.typeName() == "String":
                 myFieldsNames.append(f.name())
         if len(myFieldsNames) == 0:
-            QMessageBox.information(self.iface.mainWindow(), strWarning, self.tr('No string field names. Exiting'))
+            QMessageBox.information(
+                self.iface.mainWindow(),
+                strWarning,
+                self.tr("No string field names. Exiting"),
+            )
             return
         elif len(myFieldsNames) == 1:
             attrfield = myFieldsNames[0]
@@ -149,28 +199,34 @@ class osmpoly_export:
             else:
                 return
 
-        adir = QFileDialog.getExistingDirectory(None, self.tr('Choose a folder'), QDir.currentPath())
+        adir = QFileDialog.getExistingDirectory(
+            None, self.tr("Choose a folder"), QDir.currentPath()
+        )
 
         crsSrc = curLayer.crs()
         transform = None
         if crsSrc.authid() != "EPSG:4326":
-            crsDest = QgsCoordinateReferenceSystem('EPSG:4326')  # WGS 84
-            transform = QgsCoordinateTransform(crsSrc, crsDest, QgsProject.instance())
+            crsDest = QgsCoordinateReferenceSystem("EPSG:4326")  # WGS 84
+            transform = QgsCoordinateTransform(
+                crsSrc, crsDest, QgsProject.instance()
+            )
 
-        if adir != '':
+        if adir != "":
             num = 0
             for f in features:
                 num = num + 1
                 geom = f.geometry()
 
                 polygons = geom.asMultiPolygon()
-                if len(polygons) == 0: polygons = [geom.asPolygon()]
+                if len(polygons) == 0:
+                    polygons = [geom.asPolygon()]
 
                 attr = f[attrfield]
-                if attr == qgis.core.NULL: attr = 'feature' + str(num)
+                if attr == qgis.core.NULL:
+                    attr = "feature" + str(num)
 
-                f = open(adir + "/" + attr + '.poly', 'wb')
-                f.write((attr + "\n").encode('utf-8'))
+                f = open(adir + "/" + attr + ".poly", "wb")
+                f.write((attr + "\n").encode("utf-8"))
 
                 i = 0
                 for polygon in polygons:
@@ -188,7 +244,15 @@ class osmpoly_export:
                             v2 = vertex
                             if transform is not None:
                                 v2 = transform.transform(vertex)
-                            f.write(("    " + str(v2[0]) + "     " + str(v2[1]) + "\n").encode())
+                            f.write(
+                                (
+                                    "    "
+                                    + str(v2[0])
+                                    + "     "
+                                    + str(v2[1])
+                                    + "\n"
+                                ).encode()
+                            )
                         f.write("END\n".encode())
 
                 f.write("END\n".encode())

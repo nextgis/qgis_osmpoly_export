@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
-#******************************************************************************
+# ******************************************************************************
 #
 # OSMInfo
 # ---------------------------------------------------------
-# This plugin takes coordinates of a mouse click and gets information about all 
+# This plugin takes coordinates of a mouse click and gets information about all
 # objects from this point from OSM using Overpass API.
 #
 # *****************************************************************************
@@ -24,7 +24,7 @@
 # to the Free Software Foundation, 51 Franklin Street, Suite 500 Boston,
 # MA 02110-1335 USA.
 #
-#******************************************************************************
+# ******************************************************************************
 
 import os
 import sys
@@ -37,23 +37,28 @@ PY3 = sys.version_info[0] == 3
 if PY3:
     import configparser
 else:
-    import ConfigParser as configparser 
+    import ConfigParser as configparser
+
 
 def get_file_path(filename):
     if PY2:
-        return os.path.abspath(os.path.dirname(filename)).decode(sys.getfilesystemencoding())
+        return os.path.abspath(os.path.dirname(filename)).decode(
+            sys.getfilesystemencoding()
+        )
     else:
         return os.path.abspath(os.path.dirname(filename))
+
 
 if hasattr(core, "QGis"):
     from qgis.core import QGis
 else:
     from qgis.core import Qgis as QGis
 
+
 class QgsCoordinateTransform(core.QgsCoordinateTransform):
     def __init__(self, src_crs, dst_crs):
         super(QgsCoordinateTransform, self).__init__()
-        
+
         self.setSourceCrs(src_crs)
         self.setDestinationCrs(dst_crs)
 
@@ -63,10 +68,13 @@ class QgsCoordinateTransform(core.QgsCoordinateTransform):
         else:
             self.setDestCRS(dst_crs)
 
+
 class QgsCoordinateReferenceSystem(core.QgsCoordinateReferenceSystem):
     def __init__(self, id, type):
         if QGis.QGIS_VERSION_INT >= 30000:
-            super(QgsCoordinateReferenceSystem, self).__init__(core.QgsCoordinateReferenceSystem.fromEpsgId(id))
+            super(QgsCoordinateReferenceSystem, self).__init__(
+                core.QgsCoordinateReferenceSystem.fromEpsgId(id)
+            )
         else:
             super(QgsCoordinateReferenceSystem, self).__init__(id, type)
 
@@ -76,6 +84,7 @@ class QgsCoordinateReferenceSystem(core.QgsCoordinateReferenceSystem):
             return core.QgsCoordinateReferenceSystem.fromEpsgId(id)
         else:
             return core.QgsCoordinateReferenceSystem(id)
+
 
 if QGis.QGIS_VERSION_INT >= 30000:
     PolygonGeometry = core.QgsWkbTypes.PolygonGeometry
