@@ -127,7 +127,7 @@ class osmpoly_export:
 
     def about(self):
         dialog = about_dialog.AboutDialog(os.path.basename(self.plugin_dir))
-        dialog.exec_()
+        dialog.exec()
 
     def run(self):
         layerslist = []
@@ -194,7 +194,7 @@ class osmpoly_export:
             attrfield = myFieldsNames[0]
         else:
             res = dlgSelField(myFieldsNames)
-            if res.exec_():
+            if res.exec():
                 attrfield = res.selectedAttr()
             else:
                 return
