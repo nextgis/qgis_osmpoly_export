@@ -1,6 +1,0 @@
-<RCC>
-    <qresource prefix="/plugins/osmpoly_export" >
-        <file>icons/osmpoly_export.png</file>
-        <file>icons/about.png</file>
-    </qresource>
-</RCC>
