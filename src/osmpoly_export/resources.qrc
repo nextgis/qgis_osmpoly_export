@@ -1,5 +1,6 @@
 <RCC>
     <qresource prefix="/plugins/osmpoly_export" >
+        <file>icons/nextgis_logo.svg</file>
         <file>icons/osmpoly_export.png</file>
         <file>icons/about.png</file>
     </qresource>

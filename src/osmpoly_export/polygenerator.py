@@ -116,6 +116,15 @@ class osmpoly_export:
         self.actionRun.triggered.connect(self.run)
         self.actionAbout.triggered.connect(self.about)
 
+        self.__show_help_action = QAction(
+            QIcon(":/plugins/osmpoly_export/icons/osmpoly_export.png"),
+            "osmpoly_export",
+        )
+        self.__show_help_action.triggered.connect(self.about)
+        plugin_help_menu = self.iface.pluginHelpMenu()
+        assert plugin_help_menu is not None
+        plugin_help_menu.addAction(self.__show_help_action)
+
     def unload(self):
         self.iface.removeVectorToolBarIcon(self.actionRun)
         self.iface.removePluginVectorMenu(
