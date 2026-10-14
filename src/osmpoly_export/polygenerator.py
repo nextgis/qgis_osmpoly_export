@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 # ******************************************************************************
 #
 # osmpoly_export
@@ -26,42 +24,54 @@
 #
 # ******************************************************************************
 
+from pathlib import Path
+from typing import Iterable, Optional, cast
+
+from qgis.core import (
+    NULL,
+    QgsApplication,
+    QgsCoordinateReferenceSystem,
+    QgsCoordinateTransform,
+    QgsFeature,
+    QgsProject,
+    QgsVectorLayer,
+)
+from qgis.gui import QgisInterface
 from qgis.PyQt.QtCore import (
-    QSettings,
     QCoreApplication,
-    QFileInfo,
-    QTranslator,
     QDir,
     QLocale,
+    QSettings,
+    QTranslator,
 )
 from qgis.PyQt.QtGui import QIcon
-from qgis.PyQt.QtWidgets import QMessageBox, QAction, QFileDialog
-from qgis.core import *
-import qgis
+from qgis.PyQt.QtWidgets import QAction, QFileDialog, QMenu, QMessageBox
 
-from .compat import get_file_path, QGis, PolygonGeometry
-from . import about_dialog
-from . import resources
-import os
-from os import path
-import sys
-
-_current_path = get_file_path(__file__)
-
-from .polygenerator_dlgselfield import dlgSelField
+from osmpoly_export import about_dialog
+from osmpoly_export.compat import FieldType, GeometryType, LayerType
+from osmpoly_export.polygenerator_dlgselfield import FieldSelectionDialog
 
 
 class osmpoly_export:
-    def tr(self, message):
+    """Export polygon vector layers to Osmosis ``.poly`` files."""
+
+    def tr(self, message: str) -> str:
+        """Translate a plugin message.
+
+        :param message: Source message to translate.
+        :return: Localized message.
+        """
         return QCoreApplication.translate("osmpoly_export", message)
 
-    def __init__(self, iface):
-        """Initialize the class"""
-        # save reference to QGIS interface
-        self.iface = iface
-        self.plugin_dir = path.dirname(__file__)
+    def __init__(self, iface: QgisInterface) -> None:
+        """Initialize the plugin controller.
 
-        # i18n support
+        :param iface: QGIS application interface used to register actions.
+        """
+        self.iface = iface
+        self.plugin_directory = Path(__file__).resolve().parent
+        self.translator: Optional[QTranslator] = None
+
         override_locale = QSettings().value(
             "locale/overrideFlag", False, type=bool
         )
@@ -72,197 +82,276 @@ class osmpoly_export:
                 "locale/userLocale", "", type=str
             )
 
-        self.locale_path = "%s/i18n/osmpoly_export_%s.qm" % (
-            _current_path,
-            locale_full_name[0:2],
+        self.locale_path = (
+            self.plugin_directory
+            / "i18n"
+            / (f"osmpoly_export_{locale_full_name[:2]}.qm")
         )
-        if QFileInfo(self.locale_path).exists():
+        if self.locale_path.is_file():
             self.translator = QTranslator()
-            self.translator.load(self.locale_path)
+            self.translator.load(str(self.locale_path))
             QCoreApplication.installTranslator(self.translator)
 
-    def initGui(self):
-        """Initialize graphic user interface"""
-        self.actionRun = QAction(
-            self.tr("Export OSM Poly"), self.iface.mainWindow()
+    def initGui(self) -> None:
+        """Register plugin actions in the QGIS menus and toolbar."""
+        self.plugin_menu_name = self.tr("Export OSM Poly")
+        plugin_icon = QIcon(
+            str(self.plugin_directory / "icons" / "osmpoly_export.svg")
         )
-        self.actionRun.setIcon(
-            QIcon(":/plugins/osmpoly_export/icons/osmpoly_export.png")
+        self.plugin_menu = QMenu(
+            self.plugin_menu_name, self.iface.mainWindow()
         )
-        self.actionRun.setWhatsThis(self.tr("Start conversion to Poly"))
-        self.actionRun.setStatusTip(
+        self.plugin_menu.setIcon(plugin_icon)
+
+        self.action_run = QAction(self.tr("Export OSM Poly"), self.plugin_menu)
+        self.action_run.setIcon(plugin_icon)
+        self.action_run.setWhatsThis(self.tr("Start conversion to Poly"))
+        self.action_run.setStatusTip(
             self.tr("Export vector polygons to poly-files")
         )
 
-        self.actionAbout = QAction(self.tr("About"), self.iface.mainWindow())
-        self.actionAbout.setIcon(
-            QIcon(":/plugins/osmpoly_export/icons/about.png")
+        self.action_about = QAction(self.tr("About"), self.plugin_menu)
+        self.action_about.setIcon(
+            QgsApplication.getThemeIcon("mActionPropertiesWidget.svg")
         )
-        self.actionAbout.setWhatsThis(self.tr("About OSMPoly_export"))
+        self.action_about.setWhatsThis(self.tr("About OSMPoly_export"))
 
-        # add plugin menu to Vector
-        self.osmpoly_export_menu = self.tr("Export OSM Poly")
-        self.iface.addPluginToVectorMenu(
-            self.osmpoly_export_menu, self.actionRun
-        )
-        self.iface.addPluginToVectorMenu(
-            self.osmpoly_export_menu, self.actionAbout
-        )
+        self.plugin_menu.addAction(self.action_run)
+        self.plugin_menu.addAction(self.action_about)
+        self.iface.vectorMenu().addMenu(self.plugin_menu)
 
-        # add icon to new menu item in Vector toolbar
-        self.iface.addVectorToolBarIcon(self.actionRun)
+        self.iface.addVectorToolBarIcon(self.action_run)
 
-        # connect action to the run method
-        self.actionRun.triggered.connect(self.run)
-        self.actionAbout.triggered.connect(self.about)
+        self.action_run.triggered.connect(self.run)
+        self.action_about.triggered.connect(self.about)
 
         self.__show_help_action = QAction(
-            QIcon(":/plugins/osmpoly_export/icons/osmpoly_export.png"),
+            plugin_icon,
             "osmpoly_export",
+            self.iface.mainWindow(),
         )
         self.__show_help_action.triggered.connect(self.about)
         plugin_help_menu = self.iface.pluginHelpMenu()
         assert plugin_help_menu is not None
         plugin_help_menu.addAction(self.__show_help_action)
 
-    def unload(self):
-        self.iface.removeVectorToolBarIcon(self.actionRun)
-        self.iface.removePluginVectorMenu(
-            self.tr("Export OSM Poly"), self.actionAbout
-        )
-        self.iface.removePluginVectorMenu(
-            self.tr("Export OSM Poly"), self.actionRun
-        )
+    def unload(self) -> None:
+        """Remove plugin actions and translations from QGIS."""
+        self.iface.removeVectorToolBarIcon(self.action_run)
+        self.iface.vectorMenu().removeAction(self.plugin_menu.menuAction())
+        self.plugin_menu.deleteLater()
+        plugin_help_menu = self.iface.pluginHelpMenu()
+        if plugin_help_menu is not None:
+            plugin_help_menu.removeAction(self.__show_help_action)
+        self.__show_help_action.deleteLater()
 
-    def about(self):
-        dialog = about_dialog.AboutDialog(os.path.basename(self.plugin_dir))
+        if self.translator is not None:
+            QCoreApplication.removeTranslator(self.translator)
+            self.translator = None
+
+    def about(self) -> None:
+        """Show the plugin information dialog."""
+        dialog = about_dialog.AboutDialog(self.plugin_directory.name)
         dialog.exec()
 
-    def run(self):
-        layerslist = []
-        curLayer = self.iface.mapCanvas().currentLayer()
+    def run(self) -> None:
+        """Export selected or all features from the current polygon layer."""
+        current_layer = self._current_polygon_layer()
+        if current_layer is None:
+            return
 
-        strWarning = self.tr("Warning")
-        strInfo = self.tr("Information")
-        if curLayer == None:
-            infoString = self.tr("No layers selected")
-            QMessageBox.information(
-                self.iface.mainWindow(), strWarning, infoString
-            )
+        features = self._features_to_export(current_layer)
+        if features is None:
             return
-        if curLayer.type() != curLayer.VectorLayer:
-            infoString = self.tr("Not a vector layer")
-            QMessageBox.information(
-                self.iface.mainWindow(), strWarning, infoString
-            )
-            return
-        if curLayer.geometryType() != PolygonGeometry:
-            infoString = self.tr("Not a polygon layer")
-            QMessageBox.information(
-                self.iface.mainWindow(), strWarning, infoString
-            )
-            return
-        if curLayer.selectedFeatureCount():
-            infoString = self.tr("Using %s selected features") % str(
-                curLayer.selectedFeatureCount()
-            )
-            QMessageBox.information(
-                self.iface.mainWindow(), strInfo, infoString
-            )
-            features = curLayer.selectedFeatures()
-        else:
-            if curLayer.featureCount() == 0:
-                infoString = self.tr("Layer is empty")
-                QMessageBox.information(
-                    self.iface.mainWindow(), strWarning, infoString
-                )
-                return
-            else:
-                infoString = self.tr(
-                    "No features selected, using all %s features"
-                ) % str(curLayer.featureCount())
-                QMessageBox.information(
-                    self.iface.mainWindow(), strInfo, infoString
-                )
-                features = curLayer.getFeatures()
 
-        fProvider = curLayer.dataProvider()
-        myFields = fProvider.fields()
-        myFieldsNames = []
-        for f in myFields:
-            if f.typeName() == "String":
-                myFieldsNames.append(f.name())
-        if len(myFieldsNames) == 0:
-            QMessageBox.information(
-                self.iface.mainWindow(),
-                strWarning,
-                self.tr("No string field names. Exiting"),
-            )
+        attribute_field = self._attribute_field(current_layer)
+        if attribute_field is None:
             return
-        elif len(myFieldsNames) == 1:
-            attrfield = myFieldsNames[0]
-        else:
-            res = dlgSelField(myFieldsNames)
-            if res.exec():
-                attrfield = res.selectedAttr()
-            else:
-                return
 
-        adir = QFileDialog.getExistingDirectory(
+        output_directory = QFileDialog.getExistingDirectory(
             None, self.tr("Choose a folder"), QDir.currentPath()
         )
+        if output_directory == "":
+            return
 
-        crsSrc = curLayer.crs()
-        transform = None
-        if crsSrc.authid() != "EPSG:4326":
-            crsDest = QgsCoordinateReferenceSystem("EPSG:4326")  # WGS 84
-            transform = QgsCoordinateTransform(
-                crsSrc, crsDest, QgsProject.instance()
+        output_directory_path = Path(output_directory)
+        coordinate_transform = self._coordinate_transform(current_layer)
+        for feature_number, feature in enumerate(features, start=1):
+            self._write_feature(
+                feature,
+                attribute_field,
+                feature_number,
+                output_directory_path,
+                coordinate_transform,
             )
 
-        if adir != "":
-            num = 0
-            for f in features:
-                num = num + 1
-                geom = f.geometry()
+    def _current_polygon_layer(self) -> Optional[QgsVectorLayer]:
+        """Return the current polygon vector layer or notify the user."""
+        current_layer = self.iface.mapCanvas().currentLayer()
+        warning_title = self.tr("Warning")
+        if current_layer is None:
+            information_message = self.tr("No layers selected")
+            QMessageBox.information(
+                self.iface.mainWindow(), warning_title, information_message
+            )
+            return None
+        if current_layer.type() != LayerType.Vector:
+            information_message = self.tr("Not a vector layer")
+            QMessageBox.information(
+                self.iface.mainWindow(), warning_title, information_message
+            )
+            return None
+        if current_layer.geometryType() != GeometryType.Polygon:
+            information_message = self.tr("Not a polygon layer")
+            QMessageBox.information(
+                self.iface.mainWindow(), warning_title, information_message
+            )
+            return None
 
-                polygons = geom.asMultiPolygon()
-                if len(polygons) == 0:
-                    polygons = [geom.asPolygon()]
+        return cast(QgsVectorLayer, current_layer)
 
-                attr = f[attrfield]
-                if attr == qgis.core.NULL:
-                    attr = "feature" + str(num)
+    def _features_to_export(
+        self, current_layer: QgsVectorLayer
+    ) -> Optional[Iterable[QgsFeature]]:
+        """Return selected features or all features when none are selected."""
+        selected_feature_count = current_layer.selectedFeatureCount()
+        if selected_feature_count:
+            information_message = self.tr("Using %s selected features") % str(
+                selected_feature_count
+            )
+            QMessageBox.information(
+                self.iface.mainWindow(),
+                self.tr("Information"),
+                information_message,
+            )
+            return current_layer.selectedFeatures()
 
-                f = open(adir + "/" + attr + ".poly", "wb")
-                f.write((attr + "\n").encode("utf-8"))
+        if current_layer.featureCount() == 0:
+            QMessageBox.information(
+                self.iface.mainWindow(),
+                self.tr("Warning"),
+                self.tr("Layer is empty"),
+            )
+            return None
 
-                i = 0
-                for polygon in polygons:
-                    j = 0
-                    for ring in polygon:
-                        j = j + 1
-                        i = i + 1
-                        if j > 1:
-                            f.write(("!" + str(i) + "\n").encode())
-                        else:
-                            f.write((str(i) + "\n").encode())
+        information_message = self.tr(
+            "No features selected, using all %s features"
+        ) % str(current_layer.featureCount())
+        QMessageBox.information(
+            self.iface.mainWindow(),
+            self.tr("Information"),
+            information_message,
+        )
+        return current_layer.getFeatures()
 
-                        # del ring[-1]
-                        for vertex in ring:
-                            v2 = vertex
-                            if transform is not None:
-                                v2 = transform.transform(vertex)
-                            f.write(
-                                (
-                                    "    "
-                                    + str(v2[0])
-                                    + "     "
-                                    + str(v2[1])
-                                    + "\n"
-                                ).encode()
+    def _attribute_field(self, current_layer: QgsVectorLayer) -> Optional[str]:
+        """Return the field selected for exported file names."""
+        data_provider = current_layer.dataProvider()
+        field_names = [
+            field.name()
+            for field in data_provider.fields()
+            if field.type() == FieldType.QString
+        ]
+        if len(field_names) == 0:
+            QMessageBox.information(
+                self.iface.mainWindow(),
+                self.tr("Warning"),
+                self.tr("No string field names. Exiting"),
+            )
+            return None
+        if len(field_names) == 1:
+            return field_names[0]
+
+        field_selection_dialog = FieldSelectionDialog(
+            field_names, self.iface.mainWindow()
+        )
+        if field_selection_dialog.exec():
+            return field_selection_dialog.selected_attr()
+
+        return None
+
+    def _coordinate_transform(
+        self, current_layer: QgsVectorLayer
+    ) -> Optional[QgsCoordinateTransform]:
+        """Return a transform from the layer CRS to WGS 84 when required."""
+        source_crs = current_layer.crs()
+        if source_crs.authid() == "EPSG:4326":
+            return None
+
+        destination_crs = QgsCoordinateReferenceSystem("EPSG:4326")
+        return QgsCoordinateTransform(
+            source_crs, destination_crs, QgsProject.instance()
+        )
+
+    def _write_feature(
+        self,
+        feature: QgsFeature,
+        attribute_field: str,
+        feature_number: int,
+        output_directory: Path,
+        coordinate_transform: Optional[QgsCoordinateTransform],
+    ) -> None:
+        """Write one polygon feature to a ``.poly`` file.
+
+        Empty, null, and non-polygon geometries are ignored.
+
+        :param feature: Feature to export.
+        :param attribute_field: Field supplying the output file name.
+        :param feature_number: One-based feature number used for null names.
+        :param output_directory: Existing directory for exported files.
+        :param coordinate_transform: Transform to WGS 84, when needed.
+        """
+        geometry = feature.geometry()
+
+        if (
+            geometry.isNull()
+            or geometry.isEmpty()
+            or geometry.type() != GeometryType.Polygon
+        ):
+            return
+
+        if geometry.isMultipart():
+            polygons = geometry.asMultiPolygon()
+        else:
+            polygons = [geometry.asPolygon()]
+
+        if not polygons:
+            return
+
+        attribute_value = feature[attribute_field]
+        if attribute_value == NULL:
+            attribute_value = "feature" + str(feature_number)
+
+        output_path = output_directory / (attribute_value + ".poly")
+        with output_path.open("wb") as output_file:
+            output_file.write((attribute_value + "\n").encode("utf-8"))
+
+            ring_number = 0
+            for polygon in polygons:
+                for ring_index, ring in enumerate(polygon, start=1):
+                    ring_number += 1
+                    if ring_index > 1:
+                        output_file.write(
+                            ("!" + str(ring_number) + "\n").encode()
+                        )
+                    else:
+                        output_file.write((str(ring_number) + "\n").encode())
+
+                    for vertex in ring:
+                        transformed_vertex = vertex
+                        if coordinate_transform is not None:
+                            transformed_vertex = (
+                                coordinate_transform.transform(vertex)
                             )
-                        f.write("END\n".encode())
+                        output_file.write(
+                            (
+                                "    "
+                                + str(transformed_vertex[0])
+                                + "     "
+                                + str(transformed_vertex[1])
+                                + "\n"
+                            ).encode()
+                        )
+                    output_file.write(b"END\n")
 
-                f.write("END\n".encode())
-                f.close()
+            output_file.write(b"END\n")

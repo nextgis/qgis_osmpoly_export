@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 # ******************************************************************************
 #
 # osmpoly_export
@@ -26,48 +24,63 @@
 #
 # ******************************************************************************
 
-from qgis.PyQt.QtCore import pyqtSignal, pyqtSlot
+from typing import Optional, Sequence
+
 from qgis.PyQt.QtWidgets import (
     QDialog,
-    QRadioButton,
-    QVBoxLayout,
     QHBoxLayout,
-    QScrollArea,
-    QWidget,
     QPushButton,
+    QRadioButton,
+    QScrollArea,
+    QVBoxLayout,
+    QWidget,
 )
 
 
-class dlgSelField(QDialog):
-    def __init__(self, myFieldsNames, parent=None):
-        QDialog.__init__(self)
-        print("init")
-        names = myFieldsNames
-        self.rbl = [QRadioButton(name) for name in names]
-        self.rbl[0].setChecked(True)
+class FieldSelectionDialog(QDialog):
+    """Let the user select one string field for exported file names."""
 
-        vbox = QVBoxLayout()
-        for rb in self.rbl:
-            vbox.addWidget(rb)
-        scrollArea = QScrollArea()
-        areaWidget = QWidget()
-        areaWidget.setLayout(vbox)
-        scrollArea.setWidget(areaWidget)
+    def __init__(
+        self,
+        field_names: Sequence[str],
+        parent: Optional[QWidget] = None,
+    ) -> None:
+        """Create a field selection dialog.
 
-        hbox = QHBoxLayout()
-        pbnYes = QPushButton("Yes", self)
-        pbnCancel = QPushButton("Cancel", self)
-        hbox.addWidget(pbnYes)
-        hbox.addWidget(pbnCancel)
+        :param field_names: Non-empty field names available for selection.
+        :param parent: Parent widget that owns the dialog.
+        """
+        super().__init__(parent)
+        self.radio_buttons = [
+            QRadioButton(field_name) for field_name in field_names
+        ]
+        self.radio_buttons[0].setChecked(True)
 
-        layout = QVBoxLayout(self)
-        layout.addWidget(scrollArea)
-        layout.addLayout(hbox)
+        fields_layout = QVBoxLayout()
+        for radio_button in self.radio_buttons:
+            fields_layout.addWidget(radio_button)
+        scroll_area = QScrollArea()
+        scroll_area_widget = QWidget()
+        scroll_area_widget.setLayout(fields_layout)
+        scroll_area.setWidget(scroll_area_widget)
 
-        pbnYes.clicked.connect(self.accept)
-        pbnCancel.clicked.connect(self.reject)
+        buttons_layout = QHBoxLayout()
+        accept_button = QPushButton("Yes", self)
+        cancel_button = QPushButton("Cancel", self)
+        buttons_layout.addWidget(accept_button)
+        buttons_layout.addWidget(cancel_button)
 
-    def selectedAttr(self):
-        for rb in self.rbl:
-            if rb.isChecked():
-                return rb.text()
+        dialog_layout = QVBoxLayout(self)
+        dialog_layout.addWidget(scroll_area)
+        dialog_layout.addLayout(buttons_layout)
+
+        accept_button.clicked.connect(self.accept)
+        cancel_button.clicked.connect(self.reject)
+
+    def selected_attr(self) -> str:
+        """Return the selected field name."""
+        for radio_button in self.radio_buttons:
+            if radio_button.isChecked():
+                return radio_button.text()
+
+        raise RuntimeError("No field is selected")
