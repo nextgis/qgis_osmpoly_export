@@ -5,7 +5,7 @@ description[ru]=Экспорт векторных полигонов в поли
 about=Select a feature or export the whole layer as poly-files used by Osmosis for cliping OpenStreetMap data. Developed by NextGIS. Any feedback is welcome at https://nextgis.com/contact
 about[ru]=Выберите объект или экспортируйте весь слой в виде полифайлов, используемых Osmosis для вырезания данных OpenStreetMap. Разработан компанией NextGIS. Любые отзывы приветствуются на https://nextgis.com/contact.
 category = Vector
-version = 0.7.0
+version = 0.8.0
 qgisMinimumVersion=3.32
 qgisMaximumVersion=4.99
 
@@ -24,6 +24,13 @@ video=https://www.youtube.com/watch?v=gGE7o2_P8gA
 video[ru]=https://www.youtube.com/watch?v=q_5I5RZsOi4
 
 changelog=
+        0.8.0
+            * Added QGIS 4 and Qt 6 support
+            * Fixed Polygon and MultiPolygon export handling
+            * Updated plugin icon and menu integration
+            * Updated the About dialog and plugin metadata
+            * Improved plugin unload cleanup
+            * Modernized build and development tooling
         0.7.0
             * Updated the "About plugin" dialog
             * Added plugin item to help menu
