@@ -33,6 +33,7 @@ from qgis.core import (
     QgsCoordinateReferenceSystem,
     QgsCoordinateTransform,
     QgsFeature,
+    QgsMapLayer,
     QgsProject,
     QgsVectorLayer,
 )
@@ -124,6 +125,8 @@ class osmpoly_export:
 
         self.action_run.triggered.connect(self.run)
         self.action_about.triggered.connect(self.about)
+        self.iface.currentLayerChanged.connect(self._update_run_action_state)
+        self._update_run_action_state(self.iface.activeLayer())
 
         self.__show_help_action = QAction(
             plugin_icon,
@@ -137,6 +140,9 @@ class osmpoly_export:
 
     def unload(self) -> None:
         """Remove plugin actions and translations from QGIS."""
+        self.iface.currentLayerChanged.disconnect(
+            self._update_run_action_state
+        )
         self.iface.removeVectorToolBarIcon(self.action_run)
         self.iface.vectorMenu().removeAction(self.plugin_menu.menuAction())
         self.plugin_menu.deleteLater()
@@ -209,6 +215,17 @@ class osmpoly_export:
             return None
 
         return cast(QgsVectorLayer, current_layer)
+
+    def _update_run_action_state(
+        self, current_layer: Optional[QgsMapLayer]
+    ) -> None:
+        """Enable export only when the active layer has polygon geometry."""
+        is_polygon_vector_layer = (
+            isinstance(current_layer, QgsVectorLayer)
+            and current_layer.type() == LayerType.Vector
+            and current_layer.geometryType() == GeometryType.Polygon
+        )
+        self.action_run.setEnabled(is_polygon_vector_layer)
 
     def _features_to_export(
         self, current_layer: QgsVectorLayer
